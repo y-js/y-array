@@ -27,6 +27,10 @@ class YList
   val: ()->
     @_model.val.apply @_model, arguments
 
+  ref: ()->
+    @_model.ref.apply @_model, arguments
+
+
   observe: ()->
     @_model.observe.apply @_model, arguments
     @

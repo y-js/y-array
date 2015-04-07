@@ -31,6 +31,10 @@ YList = (function() {
     return this._model.val.apply(this._model, arguments);
   };
 
+  YList.prototype.ref = function() {
+    return this._model.ref.apply(this._model, arguments);
+  };
+
   YList.prototype.observe = function() {
     this._model.observe.apply(this._model, arguments);
     return this;

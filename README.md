@@ -1,5 +1,5 @@
 
-# List Type for Yjs
+# List Type for [Yjs](https://github.com/y-js/yjs)
 
 Manage list-like data with this shareable list type. You can insert and delete arbitrary objects (also custom types for Yjs) in the list type.
 
@@ -69,9 +69,9 @@ If two users insert something at the same position concurrently, the content tha
   * O(|ylist|)
 * .val(position)
   * O(position|)
-* Appy a delete operation from another user
+* Apply a delete operation from another user
   * O(1)
-* Appy an insert operation from another user
+* Apply an insert operation from another user
   * Yjs does not transform against operations that do not conflict with each other.
   * An operation conflicts with another operation if it intends to be inserted at the same position.
   * Overall worst case complexety: O(|conflicts|!)

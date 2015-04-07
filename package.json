@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rwth-acis/yjs"
+    "url": "https://github.com/y-js/yjs"
   },
   "keywords": [
     "Yjs",
@@ -28,9 +28,9 @@
   "author": "Kevin Jahns <kevin.jahns@rwth-aachen.de>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rwth-acis/yjs/issues"
+    "url": "https://github.com/y-js/yjs/issues"
   },
-  "homepage": "https://dadamonad.github.io/yjs/",
+  "homepage": "http://y-js.org",
   "devDependencies": {
     "codo": "^2.0.9",
     "coffee-errors": "~0.8.6",
