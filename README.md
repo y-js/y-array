@@ -50,6 +50,7 @@ var ylist = new Y.List()
 * .ref(position)
   * Retrieve a reference to the element on a *position*.
   * You can call `ref.getNext()` and `ref.getPrev()` to get the next/previous reference
+  * You can call `ref.getNext(i)` and `ref.getPrev(i)` to get the i-th next/previous reference
   * You can call `ref.val()` to get the element, to which the reference points (`y.ref(1).val() === y.val(1)`)
 * .observe(f)
   * The observer is called whenever something on this list changed. (throws insert, and delete events)
