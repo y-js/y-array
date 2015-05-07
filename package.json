@@ -1,8 +1,8 @@
 {
   "name": "y-list",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "List Type for Yjs",
-  "main": "./build/node/y.js",
+  "main": "./build/node/y-list.js",
   "directories": {
     "example": "example",
     "test": "test"
