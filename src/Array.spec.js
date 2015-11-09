@@ -3,7 +3,6 @@
 'use strict'
 
 var Y = require('../../yjs/src/SpecHelper.js')
-require('./Array.js')(Y) // TODO not here..
 
 var numberOfYArrayTests = 10
 var repeatArrayTests = 2

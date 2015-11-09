@@ -191,8 +191,7 @@ function extend (Y) {
   }))
 }
 
+module.exports = extend
 if (typeof Y !== 'undefined') {
   extend(Y)
-} else {
-  module.exports = extend
 }
