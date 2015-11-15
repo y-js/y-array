@@ -1,1 +1,334 @@
-"use strict";function _classCallCheck(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}var _createClass=function(){function e(e,t){for(var r=0;r<t.length;r++){var n=t[r];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}return function(t,r,n){return r&&e(t.prototype,r),n&&e(t,n),t}}();!function e(t,r,n){function a(s,o){if(!r[s]){if(!t[s]){var u="function"==typeof require&&require;if(!o&&u)return u(s,!0);if(i)return i(s,!0);var l=new Error("Cannot find module '"+s+"'");throw l.code="MODULE_NOT_FOUND",l}var c=r[s]={exports:{}};t[s][0].call(c.exports,function(e){var r=t[s][1][e];return a(r?r:e)},c,c.exports,e,t,r,n)}return r[s].exports}for(var i="function"==typeof require&&require,s=0;s<n.length;s++)a(n[s]);return a}({1:[function(e,t,r){function n(e){var t=function(){function t(r,n,a,i){var s=this;_classCallCheck(this,t),this.os=r,this._model=n,this.idArray=a,this.valArray=i,this.eventHandler=new e.utils.EventHandler(function(e){var t=[];for(var r in e){var n=e[r];if("Insert"===n.struct){var a=void 0;if(null===n.left)a=0;else{var i=JSON.stringify(n.left);if(a=s.idArray.indexOf(i)+1,0>=a)throw new Error("Unexpected operation!")}s.idArray.splice(a,0,JSON.stringify(n.id)),s.valArray.splice(a,0,n.content),t.push({type:"insert",object:s,index:a,length:1})}else{if("Delete"!==n.struct)throw new Error("Unexpected struct!");var a=s.idArray.indexOf(JSON.stringify(n.target));a>=0&&(s.idArray.splice(a,1),s.valArray.splice(a,1),t.push({type:"delete",object:s,index:a,length:1}))}}s.eventHandler.callEventListeners(t)})}return t.prototype.get=function(e){if(null==e||"number"!=typeof e)throw new Error("pos must be a number!");return this.valArray[e]},t.prototype.toArray=function(){return this.valArray.slice()},t.prototype.insert=function(e,t){if("number"!=typeof e)throw new Error("pos must be a number!");if(!(t instanceof Array))throw new Error("contents must be an Array of objects!");if(0!==t.length){if(e>this.idArray.length||0>e)throw new Error("This position exceeds the range of the array!");for(var r=0===e?null:JSON.parse(this.idArray[e-1]),n=[],a=r,i=0;i<t.length;i++){var s={left:a,origin:a,parent:this._model,content:t[i],struct:"Insert",id:this.os.getNextOpId()};n.push(s),a=s.id}var o=this.eventHandler;o.awaitAndPrematurelyCall(n),this.os.requestTransaction(regeneratorRuntime.mark(function u(){var e,t;return regeneratorRuntime.wrap(function(a){for(;;)switch(a.prev=a.next){case 0:if(null==r){a.next=5;break}return a.delegateYield(this.getOperation(r),"t0",2);case 2:e=a.t0.right,a.next=7;break;case 5:return a.delegateYield(this.getOperation(n[0].parent),"t1",6);case 6:e=a.t1.start;case 7:for(t in n)n[t].right=e;return a.delegateYield(this.applyCreatedOperations(n),"t2",9);case 9:o.awaitedInserts(n.length);case 10:case"end":return a.stop()}},u,this)}))}},t.prototype["delete"]=function(e,t){if(null==t&&(t=1),"number"!=typeof t)throw new Error("pos must be a number!");if("number"!=typeof e)throw new Error("pos must be a number!");if(e+t>this.idArray.length||0>e||0>t)throw new Error("The deletion range exceeds the range of the array!");if(0!==t){for(var r=this.eventHandler,n=e>0?JSON.parse(this.idArray[e-1]):null,a=[],i=0;t>i;i++)a.push({target:JSON.parse(this.idArray[e+i]),struct:"Delete"});r.awaitAndPrematurelyCall(a),this.os.requestTransaction(regeneratorRuntime.mark(function s(){return regeneratorRuntime.wrap(function(e){for(;;)switch(e.prev=e.next){case 0:return e.delegateYield(this.applyCreatedOperations(a),"t0",1);case 1:r.awaitedDeletes(a.length,n);case 2:case"end":return e.stop()}},s,this)}))}},t.prototype.observe=function(e){this.eventHandler.addEventListener(e)},t.prototype._changed=regeneratorRuntime.mark(function r(e,t){var n,a;return regeneratorRuntime.wrap(function(r){for(;;)switch(r.prev=r.next){case 0:if(t.deleted){r.next=13;break}if("Insert"!==t.struct){r.next=12;break}n=t.left;case 3:if(null==n){r.next=11;break}return r.delegateYield(e.getOperation(n),"t0",5);case 5:if(a=r.t0,a.deleted){r.next=8;break}return r.abrupt("break",11);case 8:n=a.left,r.next=3;break;case 11:t.left=n;case 12:this.eventHandler.receivedOp(t);case 13:case"end":return r.stop()}},r,this)}),_createClass(t,[{key:"length",get:function(){return this.idArray.length}}]),t}();e.extend("Array",new e.utils.CustomType({"class":t,createType:regeneratorRuntime.mark(function r(){var e,t;return regeneratorRuntime.wrap(function(r){for(;;)switch(r.prev=r.next){case 0:return e=this.store.getNextOpId(),t={struct:"List",type:"Array",start:null,end:null,id:e},r.delegateYield(this.applyCreatedOperations([t]),"t0",3);case 3:return r.abrupt("return",e);case 4:case"end":return r.stop()}},r,this)}),initType:regeneratorRuntime.mark(function n(r,a){var i,s;return regeneratorRuntime.wrap(function(n){for(;;)switch(n.prev=n.next){case 0:return i=[],n.delegateYield(e.Struct.List.map.call(this,a,function(e){return i.push(e.content),JSON.stringify(e.id)}),"t0",2);case 2:return s=n.t0,n.abrupt("return",new t(r,a.id,s,i));case 4:case"end":return n.stop()}},n,this)})}))}"undefined"!=typeof Y?n(Y):t.exports=n},{}]},{},[1]);
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/* global Y */
+'use strict';
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function extend(Y) {
+  var YArray = (function () {
+    function YArray(os, _model, idArray, valArray) {
+      var _this = this;
+
+      _classCallCheck(this, YArray);
+
+      this.os = os;
+      this._model = _model;
+      // Array of all the operation id's
+      this.idArray = idArray;
+      // Array of all the values
+      this.valArray = valArray;
+      this.eventHandler = new Y.utils.EventHandler(function (ops) {
+        var userEvents = [];
+        for (var i in ops) {
+          var op = ops[i];
+          if (op.struct === 'Insert') {
+            var pos = undefined;
+            // we check op.left only!,
+            // because op.right might not be defined when this is called
+            if (op.left === null) {
+              pos = 0;
+            } else {
+              var sid = JSON.stringify(op.left);
+              pos = _this.idArray.indexOf(sid) + 1;
+              if (pos <= 0) {
+                throw new Error('Unexpected operation!');
+              }
+            }
+            _this.idArray.splice(pos, 0, JSON.stringify(op.id));
+            _this.valArray.splice(pos, 0, op.content);
+            userEvents.push({
+              type: 'insert',
+              object: _this,
+              index: pos,
+              length: 1
+            });
+          } else if (op.struct === 'Delete') {
+            var pos = _this.idArray.indexOf(JSON.stringify(op.target));
+            if (pos >= 0) {
+              _this.idArray.splice(pos, 1);
+              _this.valArray.splice(pos, 1);
+              userEvents.push({
+                type: 'delete',
+                object: _this,
+                index: pos,
+                length: 1
+              });
+            }
+          } else {
+            throw new Error('Unexpected struct!');
+          }
+        }
+        _this.eventHandler.callEventListeners(userEvents);
+      });
+    }
+
+    _createClass(YArray, [{
+      key: 'get',
+      value: function get(pos) {
+        if (pos == null || typeof pos !== 'number') {
+          throw new Error('pos must be a number!');
+        }
+        return this.valArray[pos];
+      }
+    }, {
+      key: 'toArray',
+      value: function toArray() {
+        return this.valArray.slice();
+      }
+    }, {
+      key: 'insert',
+      value: function insert(pos, contents) {
+        if (typeof pos !== 'number') {
+          throw new Error('pos must be a number!');
+        }
+        if (!(contents instanceof Array)) {
+          throw new Error('contents must be an Array of objects!');
+        }
+        if (contents.length === 0) {
+          return;
+        }
+        if (pos > this.idArray.length || pos < 0) {
+          throw new Error('This position exceeds the range of the array!');
+        }
+        var mostLeft = pos === 0 ? null : JSON.parse(this.idArray[pos - 1]);
+
+        var ops = [];
+        var prevId = mostLeft;
+        for (var i = 0; i < contents.length; i++) {
+          var op = {
+            left: prevId,
+            origin: prevId,
+            // right: mostRight,
+            // NOTE: I intentionally do not define right here, because it could be deleted
+            // at the time of creating this operation, and is therefore not defined in idArray
+            parent: this._model,
+            content: contents[i],
+            struct: 'Insert',
+            id: this.os.getNextOpId()
+          };
+          ops.push(op);
+          prevId = op.id;
+        }
+        var eventHandler = this.eventHandler;
+        eventHandler.awaitAndPrematurelyCall(ops);
+        this.os.requestTransaction(regeneratorRuntime.mark(function _callee() {
+          var mostRight, j;
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  if (!(mostLeft != null)) {
+                    _context.next = 5;
+                    break;
+                  }
+
+                  return _context.delegateYield(this.getOperation(mostLeft), 't0', 2);
+
+                case 2:
+                  mostRight = _context.t0.right;
+                  _context.next = 7;
+                  break;
+
+                case 5:
+                  return _context.delegateYield(this.getOperation(ops[0].parent), 't1', 6);
+
+                case 6:
+                  mostRight = _context.t1.start;
+
+                case 7:
+                  for (j in ops) {
+                    ops[j].right = mostRight;
+                  }
+                  return _context.delegateYield(this.applyCreatedOperations(ops), 't2', 9);
+
+                case 9:
+                  eventHandler.awaitedInserts(ops.length);
+
+                case 10:
+                case 'end':
+                  return _context.stop();
+              }
+            }
+          }, _callee, this);
+        }));
+      }
+    }, {
+      key: 'delete',
+      value: function _delete(pos, length) {
+        if (length == null) {
+          length = 1;
+        }
+        if (typeof length !== 'number') {
+          throw new Error('pos must be a number!');
+        }
+        if (typeof pos !== 'number') {
+          throw new Error('pos must be a number!');
+        }
+        if (pos + length > this.idArray.length || pos < 0 || length < 0) {
+          throw new Error('The deletion range exceeds the range of the array!');
+        }
+        if (length === 0) {
+          return;
+        }
+        var eventHandler = this.eventHandler;
+        var newLeft = pos > 0 ? JSON.parse(this.idArray[pos - 1]) : null;
+        var dels = [];
+        for (var i = 0; i < length; i++) {
+          dels.push({
+            target: JSON.parse(this.idArray[pos + i]),
+            struct: 'Delete'
+          });
+        }
+        eventHandler.awaitAndPrematurelyCall(dels);
+        this.os.requestTransaction(regeneratorRuntime.mark(function _callee2() {
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  return _context2.delegateYield(this.applyCreatedOperations(dels), 't0', 1);
+
+                case 1:
+                  eventHandler.awaitedDeletes(dels.length, newLeft);
+
+                case 2:
+                case 'end':
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, this);
+        }));
+      }
+    }, {
+      key: 'observe',
+      value: function observe(f) {
+        this.eventHandler.addEventListener(f);
+      }
+    }, {
+      key: '_changed',
+      value: regeneratorRuntime.mark(function _changed(transaction, op) {
+        var l, left;
+        return regeneratorRuntime.wrap(function _changed$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (op.deleted) {
+                  _context3.next = 13;
+                  break;
+                }
+
+                if (!(op.struct === 'Insert')) {
+                  _context3.next = 12;
+                  break;
+                }
+
+                l = op.left;
+
+              case 3:
+                if (!(l != null)) {
+                  _context3.next = 11;
+                  break;
+                }
+
+                return _context3.delegateYield(transaction.getOperation(l), 't0', 5);
+
+              case 5:
+                left = _context3.t0;
+
+                if (left.deleted) {
+                  _context3.next = 8;
+                  break;
+                }
+
+                return _context3.abrupt('break', 11);
+
+              case 8:
+                l = left.left;
+                _context3.next = 3;
+                break;
+
+              case 11:
+                op.left = l;
+
+              case 12:
+                this.eventHandler.receivedOp(op);
+
+              case 13:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _changed, this);
+      })
+    }, {
+      key: 'length',
+      get: function get() {
+        return this.idArray.length;
+      }
+    }]);
+
+    return YArray;
+  })();
+
+  Y.extend('Array', new Y.utils.CustomType({
+    class: YArray,
+    createType: regeneratorRuntime.mark(function YArrayCreator() {
+      var modelid, model;
+      return regeneratorRuntime.wrap(function YArrayCreator$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              modelid = this.store.getNextOpId();
+              model = {
+                struct: 'List',
+                type: 'Array',
+                start: null,
+                end: null,
+                id: modelid
+              };
+              return _context4.delegateYield(this.applyCreatedOperations([model]), 't0', 3);
+
+            case 3:
+              return _context4.abrupt('return', modelid);
+
+            case 4:
+            case 'end':
+              return _context4.stop();
+          }
+        }
+      }, YArrayCreator, this);
+    }),
+    initType: regeneratorRuntime.mark(function YArrayInitializer(os, model) {
+      var valArray, idArray;
+      return regeneratorRuntime.wrap(function YArrayInitializer$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              valArray = [];
+              return _context5.delegateYield(Y.Struct.List.map.call(this, model, function (c) {
+                valArray.push(c.content);
+                return JSON.stringify(c.id);
+              }), 't0', 2);
+
+            case 2:
+              idArray = _context5.t0;
+              return _context5.abrupt('return', new YArray(os, model.id, idArray, valArray));
+
+            case 4:
+            case 'end':
+              return _context5.stop();
+          }
+        }
+      }, YArrayInitializer, this);
+    })
+  }));
+}
+
+module.exports = extend;
+if (typeof Y !== 'undefined') {
+  extend(Y);
+}
+
+},{}]},{},[1])
+
