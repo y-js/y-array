@@ -13,10 +13,10 @@ for (let database of databases) {
 
     beforeEach(async(function * (done) {
       yield createUsers(this, 3, database)
-      y1 = (yconfig1 = this.users[0]).root
-      y2 = (yconfig2 = this.users[1]).root
-      y3 = (yconfig3 = this.users[2]).root
-      flushAll = this.users[0].connector.flushAll
+      y1 = (yconfig1 = this.users[0]).share.root
+      y2 = (yconfig2 = this.users[1]).share.root
+      y3 = (yconfig3 = this.users[2]).share.root
+      flushAll = Y.utils.globalRoom.flushAll
       yield wait(10)
       done()
     }))
@@ -155,7 +155,7 @@ for (let database of databases) {
         done()
       })) */
       it('throw insert & delete events', async(function * (done) {
-        var array = yield this.users[0].root.set('array', Y.Array)
+        var array = yield this.users[0].share.root.set('array', Y.Array)
         var event
         array.observe(function (e) {
           event = e
@@ -274,12 +274,12 @@ for (let database of databases) {
         }
       }
       beforeEach(async(function * (done) {
-        yield this.users[0].root.set('Array', Y.Array)
+        yield this.users[0].share.root.set('Array', Y.Array)
         yield flushAll()
 
         var promises = []
         for (var u = 0; u < this.users.length; u++) {
-          promises.push(this.users[u].root.get('Array'))
+          promises.push(this.users[u].share.root.get('Array'))
         }
         this.arrays = yield Promise.all(promises)
         done()

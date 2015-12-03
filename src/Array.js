@@ -167,19 +167,9 @@ function extend (Y) {
   }
 
   Y.extend('Array', new Y.utils.CustomType({
+    name: 'Array', // TODO: copy the name when extending the object.. (see one line above)
     class: YArray,
-    createType: function * YArrayCreator () {
-      var modelid = this.store.getNextOpId()
-      var model = {
-        struct: 'List',
-        type: 'Array',
-        start: null,
-        end: null,
-        id: modelid
-      }
-      yield* this.applyCreatedOperations([model])
-      return modelid
-    },
+    struct: 'List',
     initType: function * YArrayInitializer (os, model) {
       var valArray = []
       var idArray = yield* Y.Struct.List.map.call(this, model, function (c) {
