@@ -33,6 +33,7 @@ function extend (Y) {
               type: 'insert',
               object: this,
               index: pos,
+              value: op.content,
               length: 1
             })
           } else if (op.struct === 'Delete') {
@@ -65,6 +66,9 @@ function extend (Y) {
     }
     toArray () {
       return this.valArray.slice()
+    }
+    push (contents) {
+      this.insert(this.idArray.length, contents)
     }
     insert (pos, contents) {
       if (typeof pos !== 'number') {
