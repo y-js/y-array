@@ -165,6 +165,7 @@ for (let database of databases) {
           type: 'insert',
           object: array,
           index: 0,
+          value: 0,
           length: 1
         }])
         array.delete(0)
