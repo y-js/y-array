@@ -39,12 +39,14 @@ function extend (Y) {
           } else if (op.struct === 'Delete') {
             let pos = this.idArray.indexOf(JSON.stringify(op.target))
             if (pos >= 0) {
+              var val = this.valArray[pos]
               this.idArray.splice(pos, 1)
               this.valArray.splice(pos, 1)
               userEvents.push({
                 type: 'delete',
                 object: this,
                 index: pos,
+                value: val,
                 length: 1
               })
             }
