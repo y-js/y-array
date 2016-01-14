@@ -173,7 +173,8 @@ for (let database of databases) {
           type: 'delete',
           object: array,
           index: 0,
-          length: 1
+          length: 1,
+          value: 0
         }])
         yield wait(50)
         done()
