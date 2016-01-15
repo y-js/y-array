@@ -4,8 +4,8 @@
 
 var Y = require('../../yjs/src/SpecHelper.js')
 
-var numberOfYArrayTests = 10
-var repeatArrayTests = 2
+var numberOfYArrayTests = 1000
+var repeatArrayTests = 5
 
 for (let database of databases) {
   describe(`Array Type (DB: ${database})`, function () {
@@ -198,6 +198,7 @@ for (let database of databases) {
         expect(l2.toArray()).toEqual([])
         done()
       }))
+      /*
       it('debug right not existend in Insert.execute', async(function * (done) {
         yconfig1.db.requestTransaction(function * () {
           var ops = [{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_',0],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_',0],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_',0],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'left':null,'right':null,'origin':null,'parent':['130',0],'parentSub':'somekey','struct':'Insert','content':512,'id':['133',0]},{'id':['130',2],'left':null,'right':null,'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':1131},{'id':['130',3],'left':null,'right':['130',2],'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':4196},{'id':['131',3],'left':null,'right':null,'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':5022}]//eslint-disable-line
@@ -250,7 +251,7 @@ for (let database of databases) {
         yield wait()
         yield flushAll()
         done()
-      }))
+      }))*/
     })
     describeManyTimes(repeatArrayTests, `Random tests`, function () {
       var randomArrayTransactions = [
@@ -291,9 +292,6 @@ for (let database of databases) {
         done()
       }))
       it(`succeed after ${numberOfYArrayTests} actions, no GC, all users disconnecting/reconnecting`, async(function * (done) {
-        for (var u of this.users) {
-          u.connector.debug = true
-        }
         yield applyRandomTransactionsAllRejoinNoGC(this.users, this.arrays, randomArrayTransactions, numberOfYArrayTests)
         yield flushAll()
         yield compareArrayValues(this.arrays)
@@ -301,9 +299,6 @@ for (let database of databases) {
         done()
       }))
       it(`succeed after ${numberOfYArrayTests} actions, GC, user[0] is not disconnecting`, async(function * (done) {
-        for (var u of this.users) {
-          u.connector.debug = true
-        }
         yield applyRandomTransactionsWithGC(this.users, this.arrays, randomArrayTransactions, numberOfYArrayTests)
         yield flushAll()
         yield compareArrayValues(this.arrays)
