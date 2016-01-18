@@ -198,7 +198,6 @@ for (let database of databases) {
         expect(l2.toArray()).toEqual([])
         done()
       }))
-      /*
       it('debug right not existend in Insert.execute', async(function * (done) {
         yconfig1.db.requestTransaction(function * () {
           var ops = [{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_',0],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_',0],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_',0],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'left':null,'right':null,'origin':null,'parent':['130',0],'parentSub':'somekey','struct':'Insert','content':512,'id':['133',0]},{'id':['130',2],'left':null,'right':null,'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':1131},{'id':['130',3],'left':null,'right':['130',2],'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':4196},{'id':['131',3],'left':null,'right':null,'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':5022}]//eslint-disable-line
@@ -251,7 +250,7 @@ for (let database of databases) {
         yield wait()
         yield flushAll()
         done()
-      }))*/
+      }))
     })
     describeManyTimes(repeatArrayTests, `Random tests`, function () {
       var randomArrayTransactions = [
