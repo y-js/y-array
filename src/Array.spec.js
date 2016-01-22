@@ -4,7 +4,7 @@
 
 var Y = require('../../yjs/src/SpecHelper.js')
 
-var numberOfYArrayTests = 1000
+var numberOfYArrayTests = 10
 var repeatArrayTests = 5
 
 for (let database of databases) {
@@ -200,7 +200,7 @@ for (let database of databases) {
       }))
       it('debug right not existend in Insert.execute', async(function * (done) {
         yconfig1.db.requestTransaction(function * () {
-          var ops = [{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_',0],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_',0],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_',0],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'left':null,'right':null,'origin':null,'parent':['130',0],'parentSub':'somekey','struct':'Insert','content':512,'id':['133',0]},{'id':['130',2],'left':null,'right':null,'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':1131},{'id':['130',3],'left':null,'right':['130',2],'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':4196},{'id':['131',3],'left':null,'right':null,'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':5022}]//eslint-disable-line
+          var ops = [{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_','Map_root'],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_','Map_root'],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_','Map_root'],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'left':null,'right':null,'origin':null,'parent':['130',0],'parentSub':'somekey','struct':'Insert','content':512,'id':['133',0]},{'id':['130',2],'left':null,'right':null,'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':1131},{'id':['130',3],'left':null,'right':['130',2],'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':4196},{'id':['131',3],'left':null,'right':null,'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':5022}]//eslint-disable-line
 
           for (var o of ops) {
             yield* this.store.tryExecute.call(this, o)
@@ -220,11 +220,11 @@ for (let database of databases) {
       it('debug right not existend in Insert.execute (2)', async(function * (done) {
         yconfig1.db.requestTransaction(function * () {
           yield* this.store.tryExecute.call(this, {'struct': 'Map', 'type': 'Map', 'id': ['153', 0], 'map': {}})
-          yield* this.store.tryExecute.call(this, {'id': ['153', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 0], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['153', 0]})
+          yield* this.store.tryExecute.call(this, {'id': ['153', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_root'], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['153', 0]})
           yield* this.store.tryExecute.call(this, {'struct': 'Map', 'type': 'Map', 'id': ['153', 0], 'map': {}})
-          yield* this.store.tryExecute.call(this, {'id': ['153', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 0], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['153', 0]})
+          yield* this.store.tryExecute.call(this, {'id': ['153', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_root'], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['153', 0]})
           yield* this.store.tryExecute.call(this, {'struct': 'Map', 'type': 'Map', 'id': ['153', 0], 'map': {}})
-          yield* this.store.tryExecute.call(this, {'id': ['153', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 0], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['153', 0]})
+          yield* this.store.tryExecute.call(this, {'id': ['153', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_root'], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['153', 0]})
           yield* this.store.tryExecute.call(this, {'left': null, 'right': null, 'origin': null, 'parent': ['153', 0], 'parentSub': 'somekey', 'struct': 'Insert', 'content': 3784, 'id': ['154', 0]})
           yield* this.store.tryExecute.call(this, {'left': null, 'right': ['154', 0], 'origin': null, 'parent': ['153', 0], 'parentSub': 'somekey', 'struct': 'Insert', 'content': 8217, 'id': ['154', 1]})
           yield* this.store.tryExecute.call(this, {'left': null, 'right': ['154', 1], 'origin': null, 'parent': ['153', 0], 'parentSub': 'somekey', 'struct': 'Insert', 'content': 5036, 'id': ['154', 2]})
