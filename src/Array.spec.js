@@ -4,7 +4,7 @@
 
 var Y = require('../../yjs/src/SpecHelper.js')
 
-var numberOfYArrayTests = 10
+var numberOfYArrayTests = 1000
 var repeatArrayTests = 5
 
 for (let database of databases) {
@@ -124,7 +124,7 @@ for (let database of databases) {
         l1 = yield y1.set('Array', Y.Array)
         l1.insert(0, ['x', 'y', 'z'])
         yield flushAll()
-        yconfig2.disconnect()
+        yield yconfig2.disconnect()
         l1.delete(0, 3)
         l2 = yield y2.get('Array')
         yield wait()
@@ -198,9 +198,21 @@ for (let database of databases) {
         expect(l2.toArray()).toEqual([])
         done()
       }))
+      /* ** not compatible with new gc algorithm **
       it('debug right not existend in Insert.execute', async(function * (done) {
         yconfig1.db.requestTransaction(function * () {
-          var ops = [{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_','Map_root'],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_','Map_root'],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'struct':'Map','type':'Map','id':['130',0],'map':{}},{'id':['130',1],'left':null,'right':null,'origin':null,'parent':['_','Map_root'],'struct':'Insert','parentSub':'Map','opContent':['130',0]},{'left':null,'right':null,'origin':null,'parent':['130',0],'parentSub':'somekey','struct':'Insert','content':512,'id':['133',0]},{'id':['130',2],'left':null,'right':null,'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':1131},{'id':['130',3],'left':null,'right':['130',2],'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':4196},{'id':['131',3],'left':null,'right':null,'origin':null,'parent':['130',0],'struct':'Insert','parentSub':'somekey','content':5022}]//eslint-disable-line
+          var ops = [
+            {'struct': 'Map', 'type': 'Map', 'id': ['130', 0],'map': {}},
+            {'id': ['130', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_root'], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['130', 0]},
+            {'struct': 'Map', 'type': 'Map', 'id': ['130', 0], 'map': {}},
+            {'id': ['130', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_root'], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['130', 0]},
+            {'struct': 'Map', 'type': 'Map', 'id': ['130', 0], 'map': {}},
+            {'id': ['130', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_root'], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['130', 0]},
+            {'left': null, 'right': null, 'origin': null, 'parent': ['130', 0], 'parentSub': 'somekey', 'struct': 'Insert', 'content': 512, 'id': ['133', 0]},
+            {'id': ['130', 2], 'left': null, 'right': null, 'origin': null, 'parent': ['130', 0], 'struct': 'Insert', 'parentSub': 'somekey', 'content': 1131},
+            {'id': ['130', 3], 'left': null, 'right': ['130', 2], 'origin': null, 'parent': ['130', 0], 'struct': 'Insert', 'parentSub': 'somekey', 'content': 4196},
+            {'id': ['131', 3], 'left': null, 'right': null, 'origin': null, 'parent': ['130', 0], 'struct': 'Insert', 'parentSub': 'somekey', 'content': 5022}
+          ] // eslint-disable-line
 
           for (var o of ops) {
             yield* this.store.tryExecute.call(this, o)
@@ -216,7 +228,7 @@ for (let database of databases) {
         yield wait()
         yield flushAll()
         done()
-      }))
+      })) */
       it('debug right not existend in Insert.execute (2)', async(function * (done) {
         yconfig1.db.requestTransaction(function * () {
           yield* this.store.tryExecute.call(this, {'struct': 'Map', 'type': 'Map', 'id': ['153', 0], 'map': {}})
@@ -244,7 +256,7 @@ for (let database of databases) {
         yield yconfig3.disconnect()
         yield yconfig2.disconnect()
         yield flushAll()
-        wait()
+        yield wait()
         yield yconfig3.reconnect()
         yield yconfig2.reconnect()
         yield wait()
