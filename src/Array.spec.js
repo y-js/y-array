@@ -228,7 +228,7 @@ for (let database of databases) {
         yield wait()
         yield flushAll()
         done()
-      })) */
+      }))
       it('debug right not existend in Insert.execute (2)', async(function * (done) {
         yconfig1.db.requestTransaction(function * () {
           yield* this.store.tryExecute.call(this, {'struct': 'Map', 'type': 'Map', 'id': ['153', 0], 'map': {}})
@@ -262,7 +262,7 @@ for (let database of databases) {
         yield wait()
         yield flushAll()
         done()
-      }))
+      }))*/
     })
     describeManyTimes(repeatArrayTests, `Random tests`, function () {
       var randomArrayTransactions = [
