@@ -4,13 +4,11 @@
 
 function extend (Y) {
   class YArray {
-    constructor (os, _model, idArray, valArray) {
+    constructor (os, _model, _content) {
       this.os = os
       this._model = _model
-      // Array of all the operation id's
-      this.idArray = idArray
-      // Array of all the values
-      this.valArray = valArray
+      // Array of all the neccessary content (includes id (string formatted, and element value))
+      this._content = _content
       this.eventHandler = new Y.utils.EventHandler(ops => {
         var userEvents = []
         for (var i in ops) {
@@ -22,14 +20,18 @@ function extend (Y) {
             if (op.left === null) {
               pos = 0
             } else {
-              var sid = JSON.stringify(op.left)
-              pos = this.idArray.indexOf(sid) + 1
+              let sid = JSON.stringify(op.left)
+              pos = 1 + this._content.findIndex(function (c) {
+                return c.id === sid
+              })
               if (pos <= 0) {
                 throw new Error('Unexpected operation!')
               }
             }
-            this.idArray.splice(pos, 0, JSON.stringify(op.id))
-            this.valArray.splice(pos, 0, op.content)
+            this._content.splice(pos, 0, {
+              id: JSON.stringify(op.id),
+              val: op.content
+            })
             userEvents.push({
               type: 'insert',
               object: this,
@@ -38,11 +40,13 @@ function extend (Y) {
               length: 1
             })
           } else if (op.struct === 'Delete') {
-            let pos = this.idArray.indexOf(JSON.stringify(op.target))
+            let sid = JSON.stringify(op.target)
+            let pos = this._content.findIndex(function (c) {
+              return c.id === sid
+            })
             if (pos >= 0) {
-              var val = this.valArray[pos]
-              this.idArray.splice(pos, 1)
-              this.valArray.splice(pos, 1)
+              var val = this._content[pos].val
+              this._content.splice(pos, 1)
               userEvents.push({
                 type: 'delete',
                 object: this,
@@ -59,19 +63,21 @@ function extend (Y) {
       })
     }
     get length () {
-      return this.idArray.length
+      return this._content.length
     }
     get (pos) {
       if (pos == null || typeof pos !== 'number') {
         throw new Error('pos must be a number!')
       }
-      return this.valArray[pos]
+      return this._content[pos].val
     }
     toArray () {
-      return this.valArray.slice()
+      return this._content.map(function (x) {
+        return x.val
+      })
     }
     push (contents) {
-      this.insert(this.idArray.length, contents)
+      this.insert(this._content.length, contents)
     }
     insert (pos, contents) {
       if (typeof pos !== 'number') {
@@ -83,10 +89,10 @@ function extend (Y) {
       if (contents.length === 0) {
         return
       }
-      if (pos > this.idArray.length || pos < 0) {
+      if (pos > this._content.length || pos < 0) {
         throw new Error('This position exceeds the range of the array!')
       }
-      var mostLeft = pos === 0 ? null : JSON.parse(this.idArray[pos - 1])
+      var mostLeft = pos === 0 ? null : JSON.parse(this._content[pos - 1].id)
 
       var ops = []
       var prevId = mostLeft
@@ -96,7 +102,8 @@ function extend (Y) {
           origin: prevId,
           // right: mostRight,
           // NOTE: I intentionally do not define right here, because it could be deleted
-          // at the time of creating this operation, and is therefore not defined in idArray
+          // at the time of inserting this operation (when we get the transaction),
+          // and would therefore not defined in this._conten
           parent: this._model,
           content: contents[i],
           struct: 'Insert',
@@ -130,18 +137,18 @@ function extend (Y) {
       if (typeof pos !== 'number') {
         throw new Error('pos must be a number!')
       }
-      if (pos + length > this.idArray.length || pos < 0 || length < 0) {
+      if (pos + length > this._content.length || pos < 0 || length < 0) {
         throw new Error('The deletion range exceeds the range of the array!')
       }
       if (length === 0) {
         return
       }
       var eventHandler = this.eventHandler
-      var newLeft = pos > 0 ? JSON.parse(this.idArray[pos - 1]) : null
+      var newLeft = pos > 0 ? JSON.parse(this._content[pos - 1].id) : null
       var dels = []
       for (var i = 0; i < length; i++) {
         dels.push({
-          target: JSON.parse(this.idArray[pos + i]),
+          target: JSON.parse(this._content[pos + i].id),
           struct: 'Delete'
         })
       }
@@ -178,12 +185,13 @@ function extend (Y) {
     class: YArray,
     struct: 'List',
     initType: function * YArrayInitializer (os, model) {
-      var valArray = []
-      var idArray = yield* Y.Struct.List.map.call(this, model, function (c) {
-        valArray.push(c.content)
-        return JSON.stringify(c.id)
+      var _content = yield* Y.Struct.List.map.call(this, model, function (c) {
+        return {
+          id: JSON.stringify(c.id),
+          val: c.content
+        }
       })
-      return new YArray(os, model.id, idArray, valArray)
+      return new YArray(os, model.id, _content)
     }
   }))
 }
