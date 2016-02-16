@@ -62,6 +62,13 @@ function extend (Y) {
         this.eventHandler.callEventListeners(userEvents)
       })
     }
+    _destroy () {
+      this.eventHandler.destroy()
+      this.eventHandler = null
+      this._content = null
+      this._model = null
+      this.os = null
+    }
     get length () {
       return this._content.length
     }
@@ -132,7 +139,7 @@ function extend (Y) {
     delete (pos, length) {
       if (length == null) { length = 1 }
       if (typeof length !== 'number') {
-        throw new Error('pos must be a number!')
+        throw new Error('length must be a number!')
       }
       if (typeof pos !== 'number') {
         throw new Error('pos must be a number!')
@@ -160,6 +167,9 @@ function extend (Y) {
     }
     observe (f) {
       this.eventHandler.addEventListener(f)
+    }
+    unobserve (f) {
+      this.eventHandler.removeEventListener(f)
     }
     * _changed (transaction, op) {
       if (!op.deleted) {
