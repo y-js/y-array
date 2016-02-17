@@ -10,7 +10,7 @@ function extend (Y) {
       this._content = _content
       this.eventHandler = new Y.utils.EventHandler(ops => {
         var userEvents = []
-        for (var i in ops) {
+        for (var i = 0; i < ops.length; i++) {
           var op = ops[i]
           if (op.struct === 'Insert') {
             let pos
@@ -128,7 +128,7 @@ function extend (Y) {
         } else {
           mostRight = (yield* this.getOperation(ops[0].parent)).start
         }
-        for (var j in ops) {
+        for (var j = 0; j < ops.length; j++) {
           ops[j].right = mostRight
         }
         yield* this.applyCreatedOperations(ops)
