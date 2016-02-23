@@ -1,11 +1,11 @@
-/* global createUsers, databases, wait, compareAllUsers, getRandomNumber, applyRandomTransactionsAllRejoinNoGC, applyRandomTransactionsWithGC, async, garbageCollectAllUsers, describeManyTimes */
+/* global createUsers, databases, wait, compareAllUsers, getRandomNumber, applyRandomTransactionsNoGCNoDisconnect, applyRandomTransactionsAllRejoinNoGC, applyRandomTransactionsWithGC, async, garbageCollectAllUsers, describeManyTimes */
 /* eslint-env browser,jasmine */
 'use strict'
 
 var Y = require('../../yjs/src/SpecHelper.js')
 
-var numberOfYArrayTests = 1000
-var repeatArrayTests = 5
+var numberOfYArrayTests = 100
+var repeatArrayTests = 1
 
 for (let database of databases) {
   describe(`Array Type (DB: ${database})`, function () {
@@ -300,6 +300,13 @@ for (let database of databases) {
       }))
       it('arrays.length equals users.length', async(function * (done) {
         expect(this.arrays.length).toEqual(this.users.length)
+        done()
+      }))
+      it(`succeed after ${numberOfYArrayTests} actions, no GC, no disconnect`, async(function * (done) {
+        yield applyRandomTransactionsNoGCNoDisconnect(this.users, this.arrays, randomArrayTransactions, numberOfYArrayTests)
+        // yield flushAll()
+        // yield compareArrayValues(this.arrays)
+        // yield compareAllUsers(this.users)
         done()
       }))
       it(`succeed after ${numberOfYArrayTests} actions, no GC, all users disconnecting/reconnecting`, async(function * (done) {

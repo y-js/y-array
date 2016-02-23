@@ -1,12 +1,8 @@
 {
   "name": "y-array",
-  "version": "0.7.15",
+  "version": "8.0.0",
   "description": "Array Type for Yjs",
   "main": "./src/Array.js",
-  "directories": {
-    "example": "example",
-    "test": "test"
-  },
   "scripts": {
     "test": "node --harmony ./node_modules/.bin/gulp test",
     "lint": "./node_modules/.bin/standard"
@@ -33,11 +29,11 @@
     "OT",
     "List",
     "Array",
-    "collaboration",
-    "synchronization",
+    "Collaboration",
+    "Synchronization",
     "ShareJs",
     "Coweb",
-    "concurrency"
+    "Concurrency"
   ],
   "author": "Kevin Jahns <kevin.jahns@rwth-aachen.de>",
   "license": "MIT",
@@ -56,5 +52,8 @@
     "pre-commit": "^1.1.2",
     "run-sequence": "^1.1.4",
     "standard": "^5.3.1"
+  },
+  "peerDependencies": {
+    "yjs": "~9.0"
   }
 }
