@@ -17,13 +17,7 @@
     "Concurrency"
   ],
   "license": "MIT",
-  "ignore": [
-    "node_modules",
-    "bower_components",
-    "test",
-    "extras",
-    "test"
-  ],
+  "ignore": [],
   "dependencies": {
     "yjs": "~9.0"
   }
