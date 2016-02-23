@@ -8,8 +8,8 @@
   "description": "Array type for Yjs",
   "main": "./y-array.js",
   "keywords": [
+    "Yjs",
     "OT",
-    "Array",
     "Collaboration",
     "Synchronization",
     "ShareJS",
