@@ -1,7 +1,7 @@
 
-# List Type for [Yjs](https://github.com/y-js/yjs)
+# Array Type for [Yjs](https://github.com/y-js/yjs)
 
-Manage list-like data with this shareable list type. You can insert and delete arbitrary objects (also custom types for Yjs) in the list type.
+Manage list-like data with this shareable Array type. You can insert and delete arbitrary objects (also custom types for Yjs) in the list type.
 
 ## Use it!
 Retrieve this with bower or npm.
@@ -11,47 +11,26 @@ Retrieve this with bower or npm.
 bower install y-list --save
 ```
 
-and include the js library.
-
-```
-<script src="./bower_components/y-list/y-list.js"></script>
-```
-
 ##### NPM
 ```
 npm install y-list --save
 ```
-and put it on the `Y` object.
-
-```
-Y.List = require("y-list");
-```
-
 
 ### List Object
 
 ##### Reference
-* Create
-```
-var ylist = new Y.List()
-```
-* .insert(position, content)
-  * Insert content at a position
-* .insertContents(position, contents)
-  * Insert a set of content at a position. This expects that contents is an array of content.
+
+* .insert(position, contents)
+  * Insert an array of content at a position
 * .push(content)
   * Insert content at the end of the list
 * .delete(position, length)
   * Delete content. The *length* parameter is optional and defaults to 1
-* .val()
+* .toArray()
   * Retrieve all content as an Array Object
-* .val(position)
+* .get(position)
   * Retrieve content from a position
-* .ref(position)
-  * Retrieve a reference to the element on a *position*.
-  * You can call `ref.getNext()` and `ref.getPrev()` to get the next/previous reference
-  * You can call `ref.getNext(i)` and `ref.getPrev(i)` to get the i-th next/previous reference
-  * You can call `ref.val()` to get the element, to which the reference points (`y.ref(1).val() === y.val(1)`)
+  * Returns a promise if the content is a custom type
 * .observe(f)
   * The observer is called whenever something on this list changed. (throws insert, and delete events)
 * .unobserve(f)
@@ -63,17 +42,13 @@ If two users insert something at the same position concurrently, the content tha
 
 # A note on time complexities
 * .insert(position, content)
-  * O(position)
-* .insertContents(position, contents)
-  * O(position + |contents|)
+  * O(position + contents.length)
 * .push(content)
   * O(1)
 * .delete(position, length)
   * O(position)
-* .val()
+* .get(i)
   * O(|ylist|)
-* .val(position)
-  * O(position|)
 * Apply a delete operation from another user
   * O(1)
 * Apply an insert operation from another user
@@ -81,9 +56,7 @@ If two users insert something at the same position concurrently, the content tha
   * An operation conflicts with another operation if it intends to be inserted at the same position.
   * Overall worst case complexety: O(|conflicts|!)
 
-
 # Issues
-* Support moving of objects
 * Create a polymer element
 
 ## License
