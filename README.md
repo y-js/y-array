@@ -1,29 +1,29 @@
 
 # Array Type for [Yjs](https://github.com/y-js/yjs)
 
-Manage list-like data with this shareable Array type. You can insert and delete arbitrary objects (also custom types for Yjs) in the list type.
+This plugins provides a shareable Array type. You can insert and delete arbitrary objects (also custom types for Yjs) in Y.Array.
 
 ## Use it!
-Retrieve this with bower or npm.
+Install this with bower or npm.
 
 ##### Bower
 ```
-bower install y-list --save
+bower install y-array --save
 ```
 
 ##### NPM
 ```
-npm install y-list --save
+npm install y-array --save
 ```
 
-### List Object
+### Array Object
 
 ##### Reference
 
 * .insert(position, contents)
   * Insert an array of content at a position
 * .push(content)
-  * Insert content at the end of the list
+  * Insert content at the end of the Array
 * .delete(position, length)
   * Delete content. The *length* parameter is optional and defaults to 1
 * .toArray()
@@ -32,7 +32,7 @@ npm install y-list --save
   * Retrieve content from a position
   * Returns a promise if the content is a custom type
 * .observe(f)
-  * The observer is called whenever something on this list changed. (throws insert, and delete events)
+  * The observer is called whenever something on this array changed. (throws insert, and delete events)
 * .unobserve(f)
   * Delete an observer
 
@@ -48,7 +48,7 @@ If two users insert something at the same position concurrently, the content tha
 * .delete(position, length)
   * O(position)
 * .get(i)
-  * O(|ylist|)
+  * O(length)
 * Apply a delete operation from another user
   * O(1)
 * Apply an insert operation from another user
@@ -60,6 +60,6 @@ If two users insert something at the same position concurrently, the content tha
 * Create a polymer element
 
 ## License
-Yjs is licensed under the [MIT License](./LICENSE.txt).
+Yjs is licensed under the [MIT License](./LICENSE).
 
 <kevin.jahns@rwth-aachen.de>
