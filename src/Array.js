@@ -11,7 +11,7 @@ function extend (Y) {
       this.eventHandler = new Y.utils.EventHandler(ops => {
         var userEvents = []
         for (var i = 0; i < ops.length; i++) {
-          var op = ops[i]
+          let op = ops[i]
           if (op.struct === 'Insert') {
             let pos
             // we check op.left only!,
@@ -27,15 +27,33 @@ function extend (Y) {
                 throw new Error('Unexpected operation!')
               }
             }
-            this._content.splice(pos, 0, {
-              id: JSON.stringify(op.id),
-              val: op.content
-            })
+            var value
+            if (op.hasOwnProperty('opContent')) {
+              this._content.splice(pos, 0, {
+                id: JSON.stringify(op.id),
+                type: op.opContent
+              })
+              let opContent = op.opContent
+              value = () => {
+                return new Promise(resolve => {
+                  this.os.requestTransaction(function *() {
+                    var type = yield* this.getType(opContent)
+                    resolve(type)
+                  })
+                })
+              }
+            } else {
+              this._content.splice(pos, 0, {
+                id: JSON.stringify(op.id),
+                val: op.content
+              })
+              value = op.content
+            }
             userEvents.push({
               type: 'insert',
               object: this,
               index: pos,
-              value: op.content,
+              value: value,
               length: 1
             })
           } else if (op.struct === 'Delete') {
@@ -44,13 +62,19 @@ function extend (Y) {
               return c.id === sid
             })
             if (pos >= 0) {
-              var val = this._content[pos].val
+              var content = this._content[pos]
               this._content.splice(pos, 1)
+              let value
+              if (content.hasOwnProperty('val')) {
+                value = content.val
+              } else {
+                value = function () {}
+              }
               userEvents.push({
                 type: 'delete',
                 object: this,
                 index: pos,
-                value: val,
+                value: value,
                 length: 1
               })
             }
@@ -75,10 +99,21 @@ function extend (Y) {
       if (pos == null || typeof pos !== 'number') {
         throw new Error('pos must be a number!')
       }
-      return this._content[pos].val
+      if (this._content[pos].type == null) {
+        return this._content[pos].val
+      } else {
+        var oid = this._content[pos].type
+        return new Promise((resolve) => {
+          this.os.requestTransaction(function *() {
+            var type = yield* this.getType(oid)
+            resolve(type)
+          })
+        })
+      }
     }
+    // only returns primitive values
     toArray () {
-      return this._content.map(function (x) {
+      return this._content.map(function (x, i) {
         return x.val
       })
     }
@@ -101,6 +136,7 @@ function extend (Y) {
       var mostLeft = pos === 0 ? null : JSON.parse(this._content[pos - 1].id)
 
       var ops = []
+      var newTypes = []
       var prevId = mostLeft
       for (var i = 0; i < contents.length; i++) {
         var op = {
@@ -109,11 +145,18 @@ function extend (Y) {
           // right: mostRight,
           // NOTE: I intentionally do not define right here, because it could be deleted
           // at the time of inserting this operation (when we get the transaction),
-          // and would therefore not defined in this._conten
+          // and would therefore not defined in this._content
           parent: this._model,
-          content: contents[i],
           struct: 'Insert',
           id: this.os.getNextOpId()
+        }
+        var val = contents[i]
+        if (!(val instanceof Y.utils.CustomType)) {
+          op.content = val
+        } else {
+          var typeid = this.os.getNextOpId()
+          newTypes.push([val, typeid])
+          op.opContent = typeid
         }
         ops.push(op)
         prevId = op.id
@@ -128,8 +171,12 @@ function extend (Y) {
         } else {
           mostRight = (yield* this.getOperation(ops[0].parent)).start
         }
+        for (var i = 0; i < newTypes.length; i++) {
+          yield* this.createType.apply(this, newTypes[i])
+        }
         for (var j = 0; j < ops.length; j++) {
-          ops[j].right = mostRight
+          var op = ops[j]
+          op.right = mostRight
         }
         yield* this.applyCreatedOperations(ops)
         eventHandler.awaitedInserts(ops.length)

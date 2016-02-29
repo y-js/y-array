@@ -179,6 +179,67 @@ for (let database of databases) {
         yield wait(50)
         done()
       }))
+      it('throw insert & delete events for types', async(function * (done) {
+        var array = yield this.users[0].share.root.set('array', Y.Array)
+        var event
+        array.observe(function (e) {
+          event = e
+        })
+        array.insert(0, [Y.Array])
+        delete event[0].value
+        expect(event).toEqual([{
+          type: 'insert',
+          object: array,
+          index: 0,
+          length: 1
+        }])
+        var type = yield array.get(0)
+        expect(type._model).toBeTruthy()
+        array.delete(0)
+        delete event[0].value
+        expect(event).toEqual([{
+          type: 'delete',
+          object: array,
+          index: 0,
+          length: 1
+        }])
+        yield wait(50)
+        yield garbageCollectAllUsers(this.users)
+        // expect(type._content == null).toBeTruthy() TODO: make sure everything is cleaned up!
+        done()
+      }))
+      it('throw insert & delete events for types (2)', async(function * (done) {
+        var array = yield this.users[0].share.root.set('array', Y.Array)
+        var event
+        array.observe(function (e) {
+          event = e
+        })
+        array.insert(0, ['hi', Y.Map])
+        delete event[1].value
+        expect(event).toEqual([{
+          type: 'insert',
+          object: array,
+          index: 0,
+          length: 1,
+          value: 'hi'
+        },
+        {
+          type: 'insert',
+          object: array,
+          index: 1,
+          length: 1
+        }])
+        array.delete(1)
+        delete event[0].value
+        expect(event).toEqual([{
+          type: 'delete',
+          object: array,
+          index: 1,
+          length: 1
+        }])
+        yield wait(50)
+        done()
+      }))
       it('garbage collects', async(function * (done) {
         var l1, l2, l3
         l1 = yield y1.set('Array', Y.Array)
@@ -268,6 +329,9 @@ for (let database of databases) {
       var randomArrayTransactions = [
         function insert (array) {
           array.insert(getRandomNumber(array.toArray().length), [getRandomNumber()])
+        },
+        function insertType (array) {
+          array.insert(getRandomNumber(array.toArray().length), [Y.Map])
         },
         function _delete (array) {
           var length = array.toArray().length
