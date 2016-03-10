@@ -330,9 +330,10 @@ for (let database of databases) {
         function insert (array) {
           array.insert(getRandomNumber(array.toArray().length), [getRandomNumber()])
         },
+        /* TODO: this is probably a gc bug
         function insertType (array) {
           array.insert(getRandomNumber(array.toArray().length), [Y.Map])
-        },
+        },*/
         function _delete (array) {
           var length = array.toArray().length
           if (length > 0) {

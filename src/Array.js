@@ -10,8 +10,7 @@ function extend (Y) {
       this._content = _content
       this.eventHandler = new Y.utils.EventHandler(ops => {
         var userEvents = []
-        for (var i = 0; i < ops.length; i++) {
-          let op = ops[i]
+        ops.forEach(op => {
           if (op.struct === 'Insert') {
             let pos
             // we check op.left only!,
@@ -28,9 +27,10 @@ function extend (Y) {
               }
             }
             var value
+            var valueId = JSON.stringify(op.id)
             if (op.hasOwnProperty('opContent')) {
               this._content.splice(pos, 0, {
-                id: JSON.stringify(op.id),
+                id: valueId,
                 type: op.opContent
               })
               let opContent = op.opContent
@@ -44,7 +44,7 @@ function extend (Y) {
               }
             } else {
               this._content.splice(pos, 0, {
-                id: JSON.stringify(op.id),
+                id: valueId,
                 val: op.content
               })
               value = op.content
@@ -54,6 +54,7 @@ function extend (Y) {
               object: this,
               index: pos,
               value: value,
+              valueId: valueId,
               length: 1
             })
           } else if (op.struct === 'Delete') {
@@ -62,26 +63,34 @@ function extend (Y) {
               return c.id === sid
             })
             if (pos >= 0) {
-              var content = this._content[pos]
+              let content = this._content[pos]
               this._content.splice(pos, 1)
               let value
               if (content.hasOwnProperty('val')) {
                 value = content.val
               } else {
-                value = function () {}
+                value = () => {
+                  return new Promise(resolve => {
+                    this.os.requestTransaction(function *() {
+                      var type = yield* this.getType(content.type)
+                      resolve(type)
+                    })
+                  })
+                }
               }
               userEvents.push({
                 type: 'delete',
                 object: this,
                 index: pos,
                 value: value,
+                _content: content,
                 length: 1
               })
             }
           } else {
             throw new Error('Unexpected struct!')
           }
-        }
+        })
         this.eventHandler.callEventListeners(userEvents)
       })
     }
@@ -98,6 +107,9 @@ function extend (Y) {
     get (pos) {
       if (pos == null || typeof pos !== 'number') {
         throw new Error('pos must be a number!')
+      }
+      if (pos >= this._content.length) {
+        return undefined
       }
       if (this._content[pos].type == null) {
         return this._content[pos].val
@@ -151,18 +163,18 @@ function extend (Y) {
           id: this.os.getNextOpId()
         }
         var val = contents[i]
-        if (!(val instanceof Y.utils.CustomType)) {
+        var typeDefinition = Y.utils.isTypeDefinition(val)
+        if (!typeDefinition) {
           op.content = val
         } else {
           var typeid = this.os.getNextOpId()
-          newTypes.push([val, typeid])
+          newTypes.push([typeDefinition, typeid])
           op.opContent = typeid
         }
         ops.push(op)
         prevId = op.id
       }
       var eventHandler = this.eventHandler
-      eventHandler.awaitAndPrematurelyCall(ops)
       this.os.requestTransaction(function *() {
         // now we can set the right reference.
         var mostRight
@@ -181,6 +193,7 @@ function extend (Y) {
         yield* this.applyCreatedOperations(ops)
         eventHandler.awaitedInserts(ops.length)
       })
+      eventHandler.awaitAndPrematurelyCall(ops)
     }
     delete (pos, length) {
       if (length == null) { length = 1 }
