@@ -34,6 +34,9 @@ function extend (Y) {
                 type: op.opContent
               })
               let opContent = op.opContent
+              if (opContent == null) {
+                debugger // TODO!! 
+              }
               value = () => {
                 return new Promise(resolve => {
                   this.os.requestTransaction(function *() {
@@ -254,11 +257,16 @@ function extend (Y) {
     class: YArray,
     struct: 'List',
     initType: function * YArrayInitializer (os, model) {
-      var _content = yield* Y.Struct.List.map.call(this, model, function (c) {
-        return {
-          id: JSON.stringify(c.id),
-          val: c.content
+      var _content = yield* Y.Struct.List.map.call(this, model, function (op) {
+        var c = {
+          id: JSON.stringify(op.id)
         }
+        if (op.hasOwnProperty('opContent')) {
+          c.type = op.opContent
+        } else {
+          c.val = op.content
+        }
+        return c
       })
       return new YArray(os, model.id, _content)
     }
