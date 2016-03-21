@@ -337,10 +337,22 @@ for (let database of databases) {
         function insert (array) {
           array.insert(getRandomNumber(array.toArray().length), [getRandomNumber()])
         },
-        /* TODO: this is probably a gc bug
-        function insertType (array) {
-          array.insert(getRandomNumber(array.toArray().length), [Y.Map])
-        },*/
+        function insertTypeArray (array) {
+          var pos = getRandomNumber(array.toArray().length)
+          array.insert(pos, [Y.Array])
+          array.get(pos).then(function (array) {
+            array.insert(0, [1, 2, 3, 4])
+          })
+        },
+        function insertTypeMap (array) {
+          var pos = getRandomNumber(array.toArray().length)
+          array.insert(pos, [Y.Map])
+          array.get(pos).then(function (map) {
+            map.set('someprop', 42)
+            map.set('someprop', 43)
+            map.set('someprop', 44)
+          })
+        },
         function _delete (array) {
           var length = array.toArray().length
           if (length > 0) {
