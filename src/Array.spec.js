@@ -4,8 +4,17 @@
 
 var Y = require('../../yjs/src/SpecHelper.js')
 
-var numberOfYArrayTests = 100
-var repeatArrayTests = 1
+function compareEvent (is, should) {
+  expect(is.length).toEqual(should.length)
+  for (var i = 0; i < is.length; i++) {
+    for (var key in should[i]) {
+      expect(should[i][key]).toEqual(is[i][key])
+    }
+  }
+}
+
+var numberOfYArrayTests = 1000
+var repeatArrayTests = 10
 
 for (let database of databases) {
   describe(`Array Type (DB: ${database})`, function () {
@@ -161,17 +170,15 @@ for (let database of databases) {
           event = e
         })
         array.insert(0, [0])
-        expect(event).toEqual([{
+        compareEvent(event, [{
           type: 'insert',
-          object: array,
           index: 0,
           value: 0,
           length: 1
         }])
         array.delete(0)
-        expect(event).toEqual([{
+        compareEvent(event, [{
           type: 'delete',
-          object: array,
           index: 0,
           length: 1,
           value: 0
@@ -187,7 +194,7 @@ for (let database of databases) {
         })
         array.insert(0, [Y.Array])
         delete event[0].value
-        expect(event).toEqual([{
+        compareEvent(event, [{
           type: 'insert',
           object: array,
           index: 0,
@@ -197,7 +204,7 @@ for (let database of databases) {
         expect(type._model).toBeTruthy()
         array.delete(0)
         delete event[0].value
-        expect(event).toEqual([{
+        compareEvent(event, [{
           type: 'delete',
           object: array,
           index: 0,
@@ -216,7 +223,7 @@ for (let database of databases) {
         })
         array.insert(0, ['hi', Y.Map])
         delete event[1].value
-        expect(event).toEqual([{
+        compareEvent(event, [{
           type: 'insert',
           object: array,
           index: 0,
@@ -231,7 +238,7 @@ for (let database of databases) {
         }])
         array.delete(1)
         delete event[0].value
-        expect(event).toEqual([{
+        compareEvent(event, [{
           type: 'delete',
           object: array,
           index: 1,

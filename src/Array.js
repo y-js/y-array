@@ -34,9 +34,6 @@ function extend (Y) {
                 type: op.opContent
               })
               let opContent = op.opContent
-              if (opContent == null) {
-                debugger // TODO!! 
-              }
               value = () => {
                 return new Promise(resolve => {
                   this.os.requestTransaction(function *() {
@@ -253,7 +250,7 @@ function extend (Y) {
   }
 
   Y.extend('Array', new Y.utils.CustomType({
-    name: 'Array', // TODO: copy the name when extending the object.. (see one line above)
+    name: 'Array',
     class: YArray,
     struct: 'List',
     initType: function * YArrayInitializer (os, model) {
