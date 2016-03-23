@@ -356,7 +356,18 @@ for (let database of databases) {
         function _delete (array) {
           var length = array.toArray().length
           if (length > 0) {
-            array.delete(getRandomNumber(length - 1))
+            var pos = getRandomNumber(length - 1)
+            if (array._content[pos].type != null) {
+              if (getRandomNumber(1) === 1) {
+                array.get(pos).then(function (map) {
+                  map.delete('someprop')
+                })
+              } else {
+                array.delete(pos)
+              }
+            } else {
+              array.delete(pos)
+            }
           }
         }
       ]
