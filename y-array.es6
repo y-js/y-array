@@ -11,8 +11,7 @@ function extend (Y) {
       this._content = _content
       this.eventHandler = new Y.utils.EventHandler(ops => {
         var userEvents = []
-        for (var i = 0; i < ops.length; i++) {
-          var op = ops[i]
+        ops.forEach(op => {
           if (op.struct === 'Insert') {
             let pos
             // we check op.left only!,
@@ -28,15 +27,35 @@ function extend (Y) {
                 throw new Error('Unexpected operation!')
               }
             }
-            this._content.splice(pos, 0, {
-              id: JSON.stringify(op.id),
-              val: op.content
-            })
+            var value
+            var valueId = JSON.stringify(op.id)
+            if (op.hasOwnProperty('opContent')) {
+              this._content.splice(pos, 0, {
+                id: valueId,
+                type: op.opContent
+              })
+              let opContent = op.opContent
+              value = () => {
+                return new Promise(resolve => {
+                  this.os.requestTransaction(function *() {
+                    var type = yield* this.getType(opContent)
+                    resolve(type)
+                  })
+                })
+              }
+            } else {
+              this._content.splice(pos, 0, {
+                id: valueId,
+                val: op.content
+              })
+              value = op.content
+            }
             userEvents.push({
               type: 'insert',
               object: this,
               index: pos,
-              value: op.content,
+              value: value,
+              valueId: valueId,
               length: 1
             })
           } else if (op.struct === 'Delete') {
@@ -45,20 +64,34 @@ function extend (Y) {
               return c.id === sid
             })
             if (pos >= 0) {
-              var val = this._content[pos].val
+              let content = this._content[pos]
               this._content.splice(pos, 1)
+              let value
+              if (content.hasOwnProperty('val')) {
+                value = content.val
+              } else {
+                value = () => {
+                  return new Promise(resolve => {
+                    this.os.requestTransaction(function *() {
+                      var type = yield* this.getType(content.type)
+                      resolve(type)
+                    })
+                  })
+                }
+              }
               userEvents.push({
                 type: 'delete',
                 object: this,
                 index: pos,
-                value: val,
+                value: value,
+                _content: content,
                 length: 1
               })
             }
           } else {
             throw new Error('Unexpected struct!')
           }
-        }
+        })
         this.eventHandler.callEventListeners(userEvents)
       })
     }
@@ -76,10 +109,24 @@ function extend (Y) {
       if (pos == null || typeof pos !== 'number') {
         throw new Error('pos must be a number!')
       }
-      return this._content[pos].val
+      if (pos >= this._content.length) {
+        return undefined
+      }
+      if (this._content[pos].type == null) {
+        return this._content[pos].val
+      } else {
+        var oid = this._content[pos].type
+        return new Promise((resolve) => {
+          this.os.requestTransaction(function *() {
+            var type = yield* this.getType(oid)
+            resolve(type)
+          })
+        })
+      }
     }
+    // only returns primitive values
     toArray () {
-      return this._content.map(function (x) {
+      return this._content.map(function (x, i) {
         return x.val
       })
     }
@@ -102,6 +149,7 @@ function extend (Y) {
       var mostLeft = pos === 0 ? null : JSON.parse(this._content[pos - 1].id)
 
       var ops = []
+      var newTypes = []
       var prevId = mostLeft
       for (var i = 0; i < contents.length; i++) {
         var op = {
@@ -110,17 +158,24 @@ function extend (Y) {
           // right: mostRight,
           // NOTE: I intentionally do not define right here, because it could be deleted
           // at the time of inserting this operation (when we get the transaction),
-          // and would therefore not defined in this._conten
+          // and would therefore not defined in this._content
           parent: this._model,
-          content: contents[i],
           struct: 'Insert',
           id: this.os.getNextOpId()
+        }
+        var val = contents[i]
+        var typeDefinition = Y.utils.isTypeDefinition(val)
+        if (!typeDefinition) {
+          op.content = val
+        } else {
+          var typeid = this.os.getNextOpId()
+          newTypes.push([typeDefinition, typeid])
+          op.opContent = typeid
         }
         ops.push(op)
         prevId = op.id
       }
       var eventHandler = this.eventHandler
-      eventHandler.awaitAndPrematurelyCall(ops)
       this.os.requestTransaction(function *() {
         // now we can set the right reference.
         var mostRight
@@ -129,12 +184,17 @@ function extend (Y) {
         } else {
           mostRight = (yield* this.getOperation(ops[0].parent)).start
         }
+        for (var i = 0; i < newTypes.length; i++) {
+          yield* this.createType.apply(this, newTypes[i])
+        }
         for (var j = 0; j < ops.length; j++) {
-          ops[j].right = mostRight
+          var op = ops[j]
+          op.right = mostRight
         }
         yield* this.applyCreatedOperations(ops)
         eventHandler.awaitedInserts(ops.length)
       })
+      eventHandler.awaitAndPrematurelyCall(ops)
     }
     delete (pos, length) {
       if (length == null) { length = 1 }
@@ -191,15 +251,20 @@ function extend (Y) {
   }
 
   Y.extend('Array', new Y.utils.CustomType({
-    name: 'Array', // TODO: copy the name when extending the object.. (see one line above)
+    name: 'Array',
     class: YArray,
     struct: 'List',
     initType: function * YArrayInitializer (os, model) {
-      var _content = yield* Y.Struct.List.map.call(this, model, function (c) {
-        return {
-          id: JSON.stringify(c.id),
-          val: c.content
+      var _content = yield* Y.Struct.List.map.call(this, model, function (op) {
+        var c = {
+          id: JSON.stringify(op.id)
         }
+        if (op.hasOwnProperty('opContent')) {
+          c.type = op.opContent
+        } else {
+          c.val = op.content
+        }
+        return c
       })
       return new YArray(os, model.id, _content)
     }

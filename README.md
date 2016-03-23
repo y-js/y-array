@@ -22,17 +22,21 @@ npm install y-array --save
 
 * .insert(position, contents)
   * Insert an array of content at a position
+  * You can also insert types `array.insert(0, Y.Map)`
 * .push(content)
   * Insert content at the end of the Array
 * .delete(position, length)
   * Delete content. The *length* parameter is optional and defaults to 1
 * .toArray()
-  * Retrieve all content as an Array Object
+  * Retrieve primitive content as an Array Object
+  * This means that this will not return type definitions (for efficiency reasons) - you have to retrieve them with `.get(position)`
 * .get(position)
   * Retrieve content from a position
-  * Returns a promise if the content is a custom type
-* .observe(f)
-  * The observer is called whenever something on this array changed. (throws insert, and delete events)
+  * Returns a promise if the content is a custom type (similar to Y.Map)
+* .observe(function observer(events){..})
+  * The `observer` is called whenever something on this array changes
+  * Throws insert, and delete events (`events[*].type`)
+  * If value is a type, `events[*].value` is a function that returns a promise for the type
 * .unobserve(f)
   * Delete an observer
 
