@@ -13,8 +13,8 @@ function compareEvent (is, should) {
   }
 }
 
-var numberOfYArrayTests = 1000
-var repeatArrayTests = 10
+var numberOfYArrayTests = 10
+var repeatArrayTests = 1
 
 for (let database of databases) {
   describe(`Array Type (DB: ${database})`, function () {

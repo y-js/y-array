@@ -164,8 +164,7 @@ function extend (Y) {
           // at the time of inserting this operation (when we get the transaction),
           // and would therefore not defined in this._content
           parent: this._model,
-          struct: 'Insert',
-          id: this.os.getNextOpId()
+          struct: 'Insert'
         }
         var _content = []
         var typeDefinition
@@ -175,15 +174,17 @@ function extend (Y) {
           if (!typeDefinition) {
             _content.push(val)
           } else if (_content.length > 0) {
-            i-- // come back again
+            i-- // come back again later
+            break
           }
         }
         if (_content.length > 0) {
           // content is defined
           op.content = _content
+          op.id = this.os.getNextOpId(_content.length)
         } else {
           // otherwise its a type
-          var typeid = this.os.getNextOpId()
+          var typeid = this.os.getNextOpId(1)
           newTypes.push([typeDefinition, typeid])
           op.opContent = typeid
         }
@@ -195,7 +196,8 @@ function extend (Y) {
         // now we can set the right reference.
         var mostRight
         if (mostLeft != null) {
-          mostRight = (yield* this.getOperation(mostLeft)).right
+          var ml = yield* this.getInsertionCleanEnd(mostLeft)
+          mostRight = ml.right
         } else {
           mostRight = (yield* this.getOperation(ops[0].parent)).start
         }
@@ -252,7 +254,7 @@ function extend (Y) {
           var l = op.left
           var left
           while (l != null) {
-            left = yield* transaction.getOperation(l)
+            left = yield* transaction.getInsertion(l)
             if (!left.deleted) {
               break
             }
