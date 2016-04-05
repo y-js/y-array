@@ -173,7 +173,7 @@ for (let database of databases) {
         compareEvent(event, [{
           type: 'insert',
           index: 0,
-          value: 0,
+          values: [0],
           length: 1
         }])
         array.delete(0)
@@ -181,7 +181,7 @@ for (let database of databases) {
           type: 'delete',
           index: 0,
           length: 1,
-          value: 0
+          values: [0]
         }])
         yield wait(50)
         done()
@@ -193,7 +193,7 @@ for (let database of databases) {
           event = e
         })
         array.insert(0, [Y.Array])
-        delete event[0].value
+        delete event[0].values
         compareEvent(event, [{
           type: 'insert',
           object: array,
@@ -203,7 +203,7 @@ for (let database of databases) {
         var type = yield array.get(0)
         expect(type._model).toBeTruthy()
         array.delete(0)
-        delete event[0].value
+        delete event[0].values
         compareEvent(event, [{
           type: 'delete',
           object: array,
@@ -222,13 +222,13 @@ for (let database of databases) {
           event = e
         })
         array.insert(0, ['hi', Y.Map])
-        delete event[1].value
+        delete event[1].values
         compareEvent(event, [{
           type: 'insert',
           object: array,
           index: 0,
           length: 1,
-          value: 'hi'
+          values: ['hi']
         },
         {
           type: 'insert',
@@ -237,7 +237,7 @@ for (let database of databases) {
           length: 1
         }])
         array.delete(1)
-        delete event[0].value
+        delete event[0].values
         compareEvent(event, [{
           type: 'delete',
           object: array,

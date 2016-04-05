@@ -6,7 +6,7 @@ function extend (Y) {
     constructor (os, _model, _content) {
       this.os = os
       this._model = _model
-      // Array of all the neccessary content (includes id (string formatted, and element value))
+      // Array of all the neccessary content
       this._content = _content
       this.eventHandler = new Y.utils.EventHandler(ops => {
         var userEvents = []
@@ -18,62 +18,66 @@ function extend (Y) {
             if (op.left === null) {
               pos = 0
             } else {
-              let sid = JSON.stringify(op.left)
               pos = 1 + this._content.findIndex(function (c) {
-                return c.id === sid
+                return Y.utils.compareIds(c.id, op.left)
               })
               if (pos <= 0) {
                 throw new Error('Unexpected operation!')
               }
             }
-            var value
-            var valueId = JSON.stringify(op.id)
+            var values
+            var length
             if (op.hasOwnProperty('opContent')) {
               this._content.splice(pos, 0, {
-                id: valueId,
+                id: op.id,
                 type: op.opContent
               })
               let opContent = op.opContent
-              value = () => {
+              length = 1
+              values = () => {
                 return new Promise(resolve => {
                   this.os.requestTransaction(function *() {
                     var type = yield* this.getType(opContent)
-                    resolve(type)
+                    resolve([type])
                   })
                 })
               }
             } else {
-              this._content.splice(pos, 0, {
-                id: valueId,
-                val: op.content
+              var contents = op.content.map(function (c, i) {
+                return {
+                  id: [op.id[0], op.id[1] + i],
+                  val: c
+                }
               })
-              value = op.content
+              // insert value in _content
+              this._content.splice.apply(this._content, [pos, 0].concat(contents))
+              values = op.content
+              length = op.content.length
             }
             userEvents.push({
               type: 'insert',
               object: this,
               index: pos,
-              value: value,
-              valueId: valueId,
-              length: 1
+              values: values,
+              // valueId: valueId, // TODO: does this still work as expected?
+              length: length
             })
           } else if (op.struct === 'Delete') {
-            let sid = JSON.stringify(op.target)
             let pos = this._content.findIndex(function (c) {
-              return c.id === sid
+              return Y.utils.compareIds(c.id, op.target)
             })
             if (pos >= 0) {
               let content = this._content[pos]
               this._content.splice(pos, 1)
-              let value
+              let values
               if (content.hasOwnProperty('val')) {
-                value = content.val
+                values = [content.val]
               } else {
-                value = () => {
+                values = () => {
                   return new Promise(resolve => {
                     this.os.requestTransaction(function *() {
                       var type = yield* this.getType(content.type)
-                      resolve(type)
+                      resolve([type])
                     })
                   })
                 }
@@ -82,8 +86,8 @@ function extend (Y) {
                 type: 'delete',
                 object: this,
                 index: pos,
-                value: value,
-                _content: content,
+                values: values,
+                _content: [content],
                 length: 1
               })
             }
@@ -145,12 +149,13 @@ function extend (Y) {
       if (pos > this._content.length || pos < 0) {
         throw new Error('This position exceeds the range of the array!')
       }
-      var mostLeft = pos === 0 ? null : JSON.parse(this._content[pos - 1].id)
+      var mostLeft = pos === 0 ? null : this._content[pos - 1].id
 
       var ops = []
       var newTypes = []
       var prevId = mostLeft
-      for (var i = 0; i < contents.length; i++) {
+      // TODOː use new content_s_ feature. don't iterate
+      for (var i = 0; i < contents.length;) {
         var op = {
           left: prevId,
           origin: prevId,
@@ -162,11 +167,22 @@ function extend (Y) {
           struct: 'Insert',
           id: this.os.getNextOpId()
         }
-        var val = contents[i]
-        var typeDefinition = Y.utils.isTypeDefinition(val)
-        if (!typeDefinition) {
-          op.content = val
+        var _content = []
+        var typeDefinition
+        while (i < contents.length) {
+          var val = contents[i++]
+          typeDefinition = Y.utils.isTypeDefinition(val)
+          if (!typeDefinition) {
+            _content.push(val)
+          } else if (_content.length > 0) {
+            i-- // come back again
+          }
+        }
+        if (_content.length > 0) {
+          // content is defined
+          op.content = _content
         } else {
+          // otherwise its a type
           var typeid = this.os.getNextOpId()
           newTypes.push([typeDefinition, typeid])
           op.opContent = typeid
@@ -210,11 +226,11 @@ function extend (Y) {
         return
       }
       var eventHandler = this.eventHandler
-      var newLeft = pos > 0 ? JSON.parse(this._content[pos - 1].id) : null
+      var newLeft = pos > 0 ? this._content[pos - 1].id : null
       var dels = []
       for (var i = 0; i < length; i++) {
         dels.push({
-          target: JSON.parse(this._content[pos + i].id),
+          target: this._content[pos + i].id,
           struct: 'Delete'
         })
       }
@@ -254,16 +270,21 @@ function extend (Y) {
     class: YArray,
     struct: 'List',
     initType: function * YArrayInitializer (os, model) {
-      var _content = yield* Y.Struct.List.map.call(this, model, function (op) {
-        var c = {
-          id: JSON.stringify(op.id)
-        }
+      var _content = []
+      yield* Y.Struct.List.map.call(this, model, function (op) {
         if (op.hasOwnProperty('opContent')) {
-          c.type = op.opContent
+          _content.push({
+            id: op.id,
+            type: op.opContent
+          })
         } else {
-          c.val = op.content
+          op.content.forEach(function (c, i) {
+            _content.push({
+              id: [op.id[0], op.id[1] + i],
+              val: op.content[i]
+            })
+          })
         }
-        return c
       })
       return new YArray(os, model.id, _content)
     }
