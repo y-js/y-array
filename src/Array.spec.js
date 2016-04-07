@@ -280,6 +280,35 @@ for (let database of databases) {
         expect(l2.toArray()).toEqual([])
         done()
       }))
+      it('Debug after implementing "content is an array" (1)', async(function * (done) {
+        this.users[1].db.requestTransaction(function * asItShouldBe () {
+          yield* this.store.tryExecute.call(this,  {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
+          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['315', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this,  {'id': ['315', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['315', 0]})
+          yield* this.store.tryExecute.call(this,  {'id': ['315', 2], 'left': null, 'right': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [8195]})
+          yield* this.store.tryExecute.call(this,  {'id': ['317', 0], 'left': null, 'right': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [333]})
+          yield* this.store.tryExecute.call(this,  {'id': ['317', 1], 'left': null, 'right': ['317', 0], 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [6880]})
+          yield* this.store.tryExecute.call(this,  {'id': ['317', 2], 'left': ['317', 1], 'right': ['317', 0], 'origin': ['317', 1], 'parent': ['315', 0], 'struct': 'Insert', 'content': [5725]})
+          console.log('done1')
+        })
+
+        this.users[2].db.requestTransaction(function * () {
+          yield* this.store.tryExecute.call(this,  {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
+          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['315', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this,  {'id': ['315', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['315', 0]})
+          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['315', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this,  {'left': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [333], 'id': ['317', 0], 'right': null})
+          yield* this.store.tryExecute.call(this,  {'left': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [6880], 'id': ['317', 1], 'right': ['317', 0]})
+          yield* this.store.tryExecute.call(this,  {'left': ['317', 1], 'origin': ['317', 1], 'parent': ['315', 0], 'struct': 'Insert', 'content': [5725], 'id': ['317', 2], 'right': ['317', 0]})
+          yield* this.store.tryExecute.call(this,  {'id': ['315', 2], 'left': null, 'right': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [8195]})
+          console.log('done2')
+        })
+
+        yield wait(100)
+
+        yield compareAllUsers([this.users[1], this.users[2]])
+        done()
+      }))
       /* ** not compatible with new gc algorithm **
       it('debug right not existend in Insert.execute', async(function * (done) {
         yconfig1.db.requestTransaction(function * () {
@@ -349,7 +378,13 @@ for (let database of databases) {
     describeManyTimes(repeatArrayTests, `Random tests`, function () {
       var randomArrayTransactions = [
         function insert (array) {
-          array.insert(getRandomNumber(array.toArray().length), [getRandomNumber()])
+          var c = getRandomNumber()
+          var content = []
+          var len = 2 // getRandomNumber(5) TODO 
+          for (var i = 0; i < len; i++) {
+            content.push(c)
+          }
+          array.insert(getRandomNumber(array.toArray().length), content)
         },
         function insertTypeArray (array) {
           var pos = getRandomNumber(array.toArray().length)

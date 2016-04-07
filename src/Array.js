@@ -187,6 +187,7 @@ function extend (Y) {
           var typeid = this.os.getNextOpId(1)
           newTypes.push([typeDefinition, typeid])
           op.opContent = typeid
+          op.id = this.os.getNextOpId(1)
         }
         ops.push(op)
         prevId = op.id
