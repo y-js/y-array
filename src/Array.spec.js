@@ -13,7 +13,7 @@ function compareEvent (is, should) {
   }
 }
 
-var numberOfYArrayTests = 1000
+var numberOfYArrayTests = 300
 var repeatArrayTests = 100
 
 for (let database of databases) {
@@ -409,35 +409,36 @@ for (let database of databases) {
         function insert (array) {
           var c = getRandomNumber()
           var content = []
-          var len = 2 // getRandomNumber(5) TODO 
+          var len = 1 // getRandomNumber(5) TODO 
           for (var i = 0; i < len; i++) {
             content.push(c)
           }
-          array.insert(getRandomNumber(array.toArray().length), content)
+          array.insert(getRandomNumber(array.toArray().length + 1), content)
         },
         function insertTypeArray (array) {
-          var pos = getRandomNumber(array.toArray().length)
+          var pos = getRandomNumber(array.toArray().length + 1)
           array.insert(pos, [Y.Array])
           array.get(pos).then(function (array) {
             array.insert(0, [1, 2, 3, 4])
           })
-        },
+        }/*,
         function insertTypeMap (array) {
-          var pos = getRandomNumber(array.toArray().length)
+          var pos = getRandomNumber(array.toArray().length + 1)
           array.insert(pos, [Y.Map])
           array.get(pos).then(function (map) {
             map.set('someprop', 42)
             map.set('someprop', 43)
             map.set('someprop', 44)
           })
-        },
+        }*/,
         function _delete (array) {
           var length = array.toArray().length
           if (length > 0) {
-            var pos = getRandomNumber(length - 1)
+            var pos = getRandomNumber(length)
             if (array._content[pos].type != null) {
-              if (getRandomNumber(1) === 1) {
+              if (getRandomNumber(2) === 1) {
                 array.get(pos).then(function (map) {
+                  debugger
                   map.delete('someprop')
                 })
               } else {
@@ -477,9 +478,9 @@ for (let database of databases) {
       }))
       it(`succeed after ${numberOfYArrayTests} actions, no GC, no disconnect`, async(function * (done) {
         yield applyRandomTransactionsNoGCNoDisconnect(this.users, this.arrays, randomArrayTransactions, numberOfYArrayTests)
-        // yield flushAll()
-        // yield compareArrayValues(this.arrays)
-        // yield compareAllUsers(this.users)
+        yield flushAll()
+        yield compareArrayValues(this.arrays)
+        yield compareAllUsers(this.users)
         done()
       }))
       it(`succeed after ${numberOfYArrayTests} actions, no GC, all users disconnecting/reconnecting`, async(function * (done) {
