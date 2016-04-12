@@ -13,7 +13,7 @@ function compareEvent (is, should) {
   }
 }
 
-var numberOfYArrayTests = 300
+var numberOfYArrayTests = 15
 var repeatArrayTests = 100
 
 for (let database of databases) {
@@ -282,24 +282,24 @@ for (let database of databases) {
       }))
       it('Debug after implementing "content is an array" (1)', async(function * (done) {
         this.users[1].db.requestTransaction(function * asItShouldBe () {
-          yield* this.store.tryExecute.call(this,  {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
-          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['315', 0], 'type': 'Array'})
-          yield* this.store.tryExecute.call(this,  {'id': ['315', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['315', 0]})
-          yield* this.store.tryExecute.call(this,  {'id': ['315', 2], 'left': null, 'right': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [8195]})
-          yield* this.store.tryExecute.call(this,  {'id': ['317', 0], 'left': null, 'right': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [333]})
-          yield* this.store.tryExecute.call(this,  {'id': ['317', 1], 'left': null, 'right': ['317', 0], 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [6880]})
-          yield* this.store.tryExecute.call(this,  {'id': ['317', 2], 'left': ['317', 1], 'right': ['317', 0], 'origin': ['317', 1], 'parent': ['315', 0], 'struct': 'Insert', 'content': [5725]})
+          yield* this.store.tryExecute.call(this, {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
+          yield* this.store.tryExecute.call(this, {'struct': 'List', 'id': ['315', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this, {'id': ['315', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['315', 0]})
+          yield* this.store.tryExecute.call(this, {'id': ['315', 2], 'left': null, 'right': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [8195]})
+          yield* this.store.tryExecute.call(this, {'id': ['317', 0], 'left': null, 'right': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [333]})
+          yield* this.store.tryExecute.call(this, {'id': ['317', 1], 'left': null, 'right': ['317', 0], 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [6880]})
+          yield* this.store.tryExecute.call(this, {'id': ['317', 2], 'left': ['317', 1], 'right': ['317', 0], 'origin': ['317', 1], 'parent': ['315', 0], 'struct': 'Insert', 'content': [5725]})
         })
 
         this.users[2].db.requestTransaction(function * () {
-          yield* this.store.tryExecute.call(this,  {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
-          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['315', 0], 'type': 'Array'})
-          yield* this.store.tryExecute.call(this,  {'id': ['315', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['315', 0]})
-          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['315', 0], 'type': 'Array'})
-          yield* this.store.tryExecute.call(this,  {'left': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [333], 'id': ['317', 0], 'right': null})
-          yield* this.store.tryExecute.call(this,  {'left': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [6880], 'id': ['317', 1], 'right': ['317', 0]})
-          yield* this.store.tryExecute.call(this,  {'left': ['317', 1], 'origin': ['317', 1], 'parent': ['315', 0], 'struct': 'Insert', 'content': [5725], 'id': ['317', 2], 'right': ['317', 0]})
-          yield* this.store.tryExecute.call(this,  {'id': ['315', 2], 'left': null, 'right': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [8195]})
+          yield* this.store.tryExecute.call(this, {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
+          yield* this.store.tryExecute.call(this, {'struct': 'List', 'id': ['315', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this, {'id': ['315', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['315', 0]})
+          yield* this.store.tryExecute.call(this, {'struct': 'List', 'id': ['315', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this, {'left': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [333], 'id': ['317', 0], 'right': null})
+          yield* this.store.tryExecute.call(this, {'left': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [6880], 'id': ['317', 1], 'right': ['317', 0]})
+          yield* this.store.tryExecute.call(this, {'left': ['317', 1], 'origin': ['317', 1], 'parent': ['315', 0], 'struct': 'Insert', 'content': [5725], 'id': ['317', 2], 'right': ['317', 0]})
+          yield* this.store.tryExecute.call(this, {'id': ['315', 2], 'left': null, 'right': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [8195]})
         })
 
         yield wait(100)
@@ -309,33 +309,127 @@ for (let database of databases) {
       }))
       it('Debug after implementing "content is an array" (2)', async(function * (done) {
         this.users[0].db.requestTransaction(function * asItShouldBe () {
-          yield* this.store.tryExecute.call(this,  {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
-          yield* this.store.tryExecute.call(this,  {'start': null, 'end': null, 'struct': 'List', 'id': ['114', 0], 'type': 'Array'})
-          yield* this.store.tryExecute.call(this,  {'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'parentSub': 'Array', 'struct': 'Insert', 'opContent': ['114', 0], 'id': ['114', 1]})
-          yield* this.store.tryExecute.call(this,  {'left': null, 'origin': null, 'parent': ['114', 0], 'struct': 'Insert', 'content': [1778, 1778], 'id': ['114', 2], 'right': null})
-          yield* this.store.tryExecute.call(this,  {'id': ['116', 0], 'left': null, 'right': null, 'origin': null, 'parent': ['114', 0], 'struct': 'Insert', 'content': [1259]})
-          yield* this.store.tryExecute.call(this,  {'id': ['116', 1], 'left': ['116', 0], 'right': null, 'origin': ['116', 0], 'parent': ['114', 0], 'struct': 'Insert', 'content': [1259]})
-          yield* this.store.tryExecute.call(this,  {'id': ['116', 2], 'left': ['116', 0], 'right': ['116', 1], 'origin': ['116', 0], 'parent': ['114', 0], 'struct': 'Insert', 'content': [6359, 6359]})
+          yield* this.store.tryExecute.call(this, {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
+          yield* this.store.tryExecute.call(this, {'start': null, 'end': null, 'struct': 'List', 'id': ['114', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this, {'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'parentSub': 'Array', 'struct': 'Insert', 'opContent': ['114', 0], 'id': ['114', 1]})
+          yield* this.store.tryExecute.call(this, {'left': null, 'origin': null, 'parent': ['114', 0], 'struct': 'Insert', 'content': [1778, 1778], 'id': ['114', 2], 'right': null})
+          yield* this.store.tryExecute.call(this, {'id': ['116', 0], 'left': null, 'right': null, 'origin': null, 'parent': ['114', 0], 'struct': 'Insert', 'content': [1259]})
+          yield* this.store.tryExecute.call(this, {'id': ['116', 1], 'left': ['116', 0], 'right': null, 'origin': ['116', 0], 'parent': ['114', 0], 'struct': 'Insert', 'content': [1259]})
+          yield* this.store.tryExecute.call(this, {'id': ['116', 2], 'left': ['116', 0], 'right': ['116', 1], 'origin': ['116', 0], 'parent': ['114', 0], 'struct': 'Insert', 'content': [6359, 6359]})
           console.log('done1')
         })
 
         this.users[1].db.requestTransaction(function * () {
-          yield* this.store.tryExecute.call(this,  {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
-          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['114', 0], 'type': 'Array'})
-          yield* this.store.tryExecute.call(this,  {'id': ['114', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['114', 0]})
-          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['114', 0], 'type': 'Array'})
-          yield* this.store.tryExecute.call(this,  {'id': ['114', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['114', 0]})
-          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['114', 0], 'type': 'Array'})
-          yield* this.store.tryExecute.call(this,  {'id': ['114', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['114', 0]})
-          yield* this.store.tryExecute.call(this,  {'id': ['116', 0], 'left': null, 'right': null, 'origin': null, 'parent': ['114', 0], 'struct': 'Insert', 'content': [1259, 1259]})
-          yield* this.store.tryExecute.call(this,  {'id': ['116', 2], 'left': ['116', 0], 'right': ['116', 1], 'origin': ['116', 0], 'parent': ['114', 0], 'struct': 'Insert', 'content': [6359, 6359]})
-          yield* this.store.tryExecute.call(this,  {'id': ['114', 2], 'left': null, 'right': ['116', 0], 'origin': null, 'parent': ['114', 0], 'struct': 'Insert', 'content': [1778, 1778]})
+          yield* this.store.tryExecute.call(this, {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
+          yield* this.store.tryExecute.call(this, {'struct': 'List', 'id': ['114', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this, {'id': ['114', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['114', 0]})
+          yield* this.store.tryExecute.call(this, {'struct': 'List', 'id': ['114', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this, {'id': ['114', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['114', 0]})
+          yield* this.store.tryExecute.call(this, {'struct': 'List', 'id': ['114', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this, {'id': ['114', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['114', 0]})
+          yield* this.store.tryExecute.call(this, {'id': ['116', 0], 'left': null, 'right': null, 'origin': null, 'parent': ['114', 0], 'struct': 'Insert', 'content': [1259, 1259]})
+          yield* this.store.tryExecute.call(this, {'id': ['116', 2], 'left': ['116', 0], 'right': ['116', 1], 'origin': ['116', 0], 'parent': ['114', 0], 'struct': 'Insert', 'content': [6359, 6359]})
+          yield* this.store.tryExecute.call(this, {'id': ['114', 2], 'left': null, 'right': ['116', 0], 'origin': null, 'parent': ['114', 0], 'struct': 'Insert', 'content': [1778, 1778]})
           console.log('done2')
         })
 
         yield wait(100)
 
         yield compareAllUsers([this.users[0], this.users[1]])
+        done()
+      }))
+      it('Debug after implementing "content is an array" (3)', async(function * (done) {
+        this.users[0].db.requestTransaction(function * () {
+          yield* this.store.tryExecute.call(this, {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
+          yield* this.store.tryExecute.call(this, {'struct': 'List', 'id': ['117', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this, {'id': ['117', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['117', 0]})
+          yield* this.store.tryExecute.call(this, {'struct': 'List', 'id': ['117', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this, {'id': ['117', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['117', 0]})
+          yield* this.store.tryExecute.call(this, {'struct': 'List', 'id': ['117', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this, {'id': ['117', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['117', 0]})
+          yield* this.store.tryExecute.call(this, {'left': null, 'origin': null, 'parent': ['117', 0], 'struct': 'Insert', 'content': [1175, 1176], 'id': ['118', 0], 'right': null})
+          yield* this.store.tryExecute.call(this, {'id': ['117', 2], 'left': null, 'right': null, 'origin': null, 'parent': ['117', 0], 'struct': 'Insert', 'content': [1249, 1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257]})
+          yield* this.store.tryExecute.call(this, {'id': ['119', 0], 'left': ['117', 10], 'right': null, 'origin': ['117', 10], 'parent': ['117', 0], 'struct': 'Insert', 'content': [2715, 2716, 2717, 2718, 2719, 2720]})
+          yield* this.store.tryExecute.call(this, {'target': ['118', 1], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this, {'left': ['117', 2], 'origin': ['117', 2], 'parent': ['117', 0], 'struct': 'Insert', 'content': [6013, 6014, 6015, 6016, 6017, 6018, 6019, 6020, 6021], 'id': ['118', 2], 'right': ['117', 3]})
+          yield* this.store.tryExecute.call(this, {'target': ['117', 2], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this, {'target': ['118', 5], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this, {'target': ['119', 1], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this, {'target': ['117', 5], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this, {'target': ['119', 1], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this, {'target': ['117', 9], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this, {'target': ['117', 8], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this, {'target': ['117', 13], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this, {'target': ['117', 15], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this, {'target': ['117', 15], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this, {'id': ['117', 11], 'left': ['117', 6], 'right': ['117', 7], 'origin': ['117', 6], 'parent': ['117', 0], 'struct': 'Insert', 'content': [6498, 6499, 6500, 6501, 6502, 6503, 6504, 6505]})
+          yield* this.store.tryExecute.call(this, {'struct': 'Delete', 'target': ['117', 13]})
+          yield* this.store.tryExecute.call(this, {'id': ['119', 6], 'left': ['117', 5], 'right': ['117', 6], 'origin': ['117', 5], 'parent': ['117', 0], 'struct': 'Insert', 'content': [777, 778, 779, 780, 781, 782, 783, 784, 785]})
+          yield* this.store.tryExecute.call(this, {'id': ['117', 19], 'left': ['117', 17], 'right': ['117', 18], 'origin': ['117', 17], 'parent': ['117', 0], 'struct': 'Insert', 'content': [7283]})
+          yield* this.store.tryExecute.call(this, {'id': ['119', 15], 'left': ['117', 6], 'right': ['117', 11], 'origin': ['117', 6], 'parent': ['117', 0], 'struct': 'Insert', 'content': [8633, 8634]})
+          yield* this.store.tryExecute.call(this, {'id': ['119', 17], 'left': ['119', 2], 'right': ['119', 3], 'origin': ['119', 2], 'parent': ['117', 0], 'struct': 'Insert', 'content': [5921, 5922, 5923, 5924, 5925]})
+          yield* this.store.tryExecute.call(this, {'id': ['117', 20], 'left': ['118', 1], 'right': null, 'origin': ['118', 1], 'parent': ['117', 0], 'struct': 'Insert', 'content': [9723]})
+          yield* this.garbageCollectOperation(['117', 9])
+          console.log('done1')
+        })
+
+        yield wait(100)
+
+        expect(this.users[0].db.os.find(['117', 15]).next().value.deleted).toBeTruthy()
+        done()
+      }))
+      it('Debug after implementing "content is an array" (4)', async(function * (done) {
+        this.users[0].db.requestTransaction(function * () {
+          yield* this.store.tryExecute.call(this,  {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
+          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['459', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this,  {'id': ['459', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['459', 0]})
+          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['459', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this,  {'id': ['459', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['459', 0]})
+          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['459', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this,  {'id': ['459', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['459', 0]})
+          yield* this.store.tryExecute.call(this,  {'start': null, 'end': null, 'struct': 'List', 'id': ['460', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this,  {'left': null, 'origin': null, 'parent': ['459', 0], 'struct': 'Insert', 'opContent': ['460', 0], 'id': ['460', 1], 'right': null})
+          yield* this.store.tryExecute.call(this,  {'left': null, 'origin': null, 'parent': ['460', 0], 'struct': 'Insert', 'content': [1, 2, 3, 4], 'id': ['460', 2], 'right': null})
+          yield* this.store.tryExecute.call(this,  {'id': ['460', 6], 'map': {}, 'struct': 'Map', 'type': 'Map'})
+          yield* this.store.tryExecute.call(this,  {'left': null, 'origin': null, 'parent': ['459', 0], 'struct': 'Insert', 'opContent': ['460', 6], 'id': ['460', 7], 'right': ['460', 1]})
+          yield* this.store.tryExecute.call(this,  {'left': null, 'right': null, 'origin': null, 'parent': ['460', 6], 'parentSub': 'someprop', 'struct': 'Insert', 'content': [42], 'id': ['460', 8]})
+          yield* this.store.tryExecute.call(this,  {'left': null, 'right': ['460', 8], 'origin': null, 'parent': ['460', 6], 'parentSub': 'someprop', 'struct': 'Insert', 'content': [43], 'id': ['460', 9]})
+          yield* this.store.tryExecute.call(this,  {'left': null, 'right': ['460', 9], 'origin': null, 'parent': ['460', 6], 'parentSub': 'someprop', 'struct': 'Insert', 'content': [44], 'id': ['460', 10]})
+          yield* this.store.tryExecute.call(this,  {'id': ['460', 11], 'map': {}, 'struct': 'Map', 'type': 'Map'})
+          yield* this.store.tryExecute.call(this,  {'left': null, 'origin': null, 'parent': ['459', 0], 'struct': 'Insert', 'opContent': ['460', 11], 'id': ['460', 12], 'right': ['460', 7]})
+          yield* this.store.tryExecute.call(this,  {'left': null, 'right': null, 'origin': null, 'parent': ['460', 11], 'parentSub': 'someprop', 'struct': 'Insert', 'content': [42], 'id': ['460', 13]})
+          yield* this.store.tryExecute.call(this,  {'left': null, 'right': ['460', 13], 'origin': null, 'parent': ['460', 11], 'parentSub': 'someprop', 'struct': 'Insert', 'content': [43], 'id': ['460', 14]})
+          yield* this.store.tryExecute.call(this,  {'left': null, 'right': ['460', 14], 'origin': null, 'parent': ['460', 11], 'parentSub': 'someprop', 'struct': 'Insert', 'content': [44], 'id': ['460', 15]})
+          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['459', 2], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this,  {'struct': 'List', 'id': ['461', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this,  {'target': ['459', 7], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this,  {'target': ['459', 3], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this,  {'target': ['460', 1], 'struct': 'Delete'})
+          yield* this.store.tryExecute.call(this,  {'id': ['459', 3], 'left': null, 'right': null, 'origin': null, 'parent': ['459', 0], 'struct': 'Insert', 'opContent': ['459', 2]})
+          yield* this.store.tryExecute.call(this,  {'struct': 'Delete', 'target': ['459', 3]})
+          yield* this.store.tryExecute.call(this,  {'id': ['459', 4], 'left': null, 'right': null, 'origin': null, 'parent': ['459', 2], 'struct': 'Insert', 'content': [1, 2, 3, 4]})
+          yield* this.store.tryExecute.call(this,  {'id': ['461', 1], 'left': ['460', 1], 'right': null, 'origin': ['460', 1], 'parent': ['459', 0], 'struct': 'Insert', 'opContent': ['461', 0]})
+          yield* this.store.tryExecute.call(this,  {'id': ['461', 2], 'left': null, 'right': null, 'origin': null, 'parent': ['461', 0], 'struct': 'Insert', 'content': [1, 2, 3, 4]})
+          yield* this.garbageCollectOperation(['460', 8])
+          yield* this.garbageCollectOperation(['460', 13])
+          yield* this.garbageCollectOperation(['460', 2])
+          yield* this.garbageCollectOperation(['460', 2])
+          yield* this.garbageCollectOperation(['460', 3])
+          yield* this.garbageCollectOperation(['460', 4])
+          yield* this.garbageCollectOperation(['460', 5])
+          yield* this.garbageCollectOperation(['459', 4])
+          yield* this.garbageCollectOperation(['459', 4])
+          yield* this.garbageCollectOperation(['459', 5])
+          yield* this.garbageCollectOperation(['459', 6])
+          yield* this.garbageCollectOperation(['459', 7])
+          var isDeleted = yield* this.isDeleted(['460', 0])
+          expect(isDeleted).toBeTruthy()
+          console.log('done1')
+        })
+
+        yield wait(100)
+
+        expect(this.users[0].db.os.find(['460', 0]).next().value.deleted).toBeTruthy()
         done()
       }))
       /* ** not compatible with new gc algorithm **
@@ -409,9 +503,9 @@ for (let database of databases) {
         function insert (array) {
           var c = getRandomNumber()
           var content = []
-          var len = 1 // getRandomNumber(5) TODO 
+          var len = getRandomNumber(4)
           for (var i = 0; i < len; i++) {
-            content.push(c)
+            content.push(c + i)
           }
           array.insert(getRandomNumber(array.toArray().length + 1), content)
         },
@@ -421,7 +515,7 @@ for (let database of databases) {
           array.get(pos).then(function (array) {
             array.insert(0, [1, 2, 3, 4])
           })
-        }/*,
+        },
         function insertTypeMap (array) {
           var pos = getRandomNumber(array.toArray().length + 1)
           array.insert(pos, [Y.Map])
@@ -430,16 +524,22 @@ for (let database of databases) {
             map.set('someprop', 43)
             map.set('someprop', 44)
           })
-        }*/,
+        },
         function _delete (array) {
-          var length = array.toArray().length
+          var length = array._content.length
           if (length > 0) {
             var pos = getRandomNumber(length)
             if (array._content[pos].type != null) {
               if (getRandomNumber(2) === 1) {
-                array.get(pos).then(function (map) {
-                  debugger
-                  map.delete('someprop')
+                array.get(pos).then(function (type) {
+                  if (type instanceof Y.Array.typeDefinition.class) {
+                    if (type._content.length > 0) {
+                      var pos = getRandomNumber(type._content.length)
+                      type.delete(pos)
+                    }
+                  } else {
+                    type.delete('someprop')
+                  }
                 })
               } else {
                 array.delete(pos)
