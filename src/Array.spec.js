@@ -13,7 +13,7 @@ function compareEvent (is, should) {
   }
 }
 
-var numberOfYArrayTests = 15
+var numberOfYArrayTests = 500
 var repeatArrayTests = 100
 
 for (let database of databases) {
@@ -183,12 +183,12 @@ for (let database of databases) {
         array.observe(function (e) {
           event = e
         })
-        array.insert(0, [0])
+        array.insert(0, [0, 1, 2])
         compareEvent(event, [{
           type: 'insert',
           index: 0,
-          values: [0],
-          length: 1
+          values: [0, 1, 2],
+          length: 3
         }])
         array.delete(0)
         compareEvent(event, [{
@@ -196,6 +196,13 @@ for (let database of databases) {
           index: 0,
           length: 1,
           values: [0]
+        }])
+        array.delete(0, 2)
+        compareEvent(event, [{
+          type: 'delete',
+          index: 0,
+          length: 2,
+          values: [1, 2]
         }])
         yield wait(50)
         done()

@@ -67,28 +67,29 @@ function extend (Y) {
               return Y.utils.compareIds(c.id, op.target)
             })
             if (pos >= 0) {
-              let content = this._content[pos]
-              this._content.splice(pos, 1)
-              let values
-              if (content.hasOwnProperty('val')) {
-                values = [content.val]
-              } else {
-                values = () => {
-                  return new Promise(resolve => {
-                    this.os.requestTransaction(function *() {
-                      var type = yield* this.getType(content.type)
-                      resolve([type])
+              let content = this._content.splice(pos, op.length || 1)
+              let values = []
+              content.forEach((c) => {
+                if (c.hasOwnProperty('val')) {
+                  values.push(c.val)
+                } else {
+                  values = () => {
+                    return new Promise(resolve => {
+                      this.os.requestTransaction(function *() {
+                        var type = yield* this.getType(c.type)
+                        resolve([type])
+                      })
                     })
-                  })
+                  }
                 }
-              }
+              })
               userEvents.push({
                 type: 'delete',
                 object: this,
                 index: pos,
                 values: values,
-                _content: [content],
-                length: 1
+                _content: content,
+                length: op.length || 1
               })
             }
           } else {
@@ -232,9 +233,18 @@ function extend (Y) {
       var newLeft = pos > 0 ? this._content[pos - 1].id : null
       var dels = []
       for (var i = 0; i < length; i++) {
+        var targetId = this._content[pos + i].id
+        var delLength
+        // how many insertions can we delete in one deletion?
+        for (delLength = 1; i + delLength < length; delLength++) {
+          if (!Y.utils.compareIds(this._content[pos + i + delLength].id, [targetId[0], targetId[1] + delLength])) {
+            break
+          }
+        }
         dels.push({
-          target: this._content[pos + i].id,
-          struct: 'Delete'
+          target: targetId,
+          struct: 'Delete',
+          length: delLength
         })
       }
       eventHandler.awaitAndPrematurelyCall(dels)
