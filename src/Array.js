@@ -232,7 +232,7 @@ function extend (Y) {
       var eventHandler = this.eventHandler
       var newLeft = pos > 0 ? this._content[pos - 1].id : null
       var dels = []
-      for (var i = 0; i < length; i++) {
+      for (var i = 0; i < length; i = i + delLength) {
         var targetId = this._content[pos + i].id
         var delLength
         // how many insertions can we delete in one deletion?
