@@ -68,20 +68,8 @@ function extend (Y) {
             })
             if (pos >= 0) {
               let content = this._content.splice(pos, op.length || 1)
-              let values = []
-              content.forEach((c) => {
-                if (c.hasOwnProperty('val')) {
-                  values.push(c.val)
-                } else {
-                  values = () => {
-                    return new Promise(resolve => {
-                      this.os.requestTransaction(function *() {
-                        var type = yield* this.getType(c.type)
-                        resolve([type])
-                      })
-                    })
-                  }
-                }
+              let values = content.map((c) => {
+                return c.val
               })
               userEvents.push({
                 type: 'delete',
