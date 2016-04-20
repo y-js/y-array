@@ -13,7 +13,7 @@ function compareEvent (is, should) {
   }
 }
 
-var numberOfYArrayTests = 120
+var numberOfYArrayTests = 200
 var repeatArrayTests = 100
 
 for (let database of databases) {
@@ -494,71 +494,18 @@ for (let database of databases) {
         yield compareAllUsers([this.users[0], this.users[1]])
         done()
       }))
-      /* ** not compatible with new gc algorithm **
-      it('debug right not existend in Insert.execute', async(function * (done) {
-        yconfig1.db.requestTransaction(function * () {
-          var ops = [
-            {'struct': 'Map', 'type': 'Map', 'id': ['130', 0],'map': {}},
-            {'id': ['130', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_root'], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['130', 0]},
-            {'struct': 'Map', 'type': 'Map', 'id': ['130', 0], 'map': {}},
-            {'id': ['130', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_root'], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['130', 0]},
-            {'struct': 'Map', 'type': 'Map', 'id': ['130', 0], 'map': {}},
-            {'id': ['130', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_root'], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['130', 0]},
-            {'left': null, 'right': null, 'origin': null, 'parent': ['130', 0], 'parentSub': 'somekey', 'struct': 'Insert', 'content': 512, 'id': ['133', 0]},
-            {'id': ['130', 2], 'left': null, 'right': null, 'origin': null, 'parent': ['130', 0], 'struct': 'Insert', 'parentSub': 'somekey', 'content': 1131},
-            {'id': ['130', 3], 'left': null, 'right': ['130', 2], 'origin': null, 'parent': ['130', 0], 'struct': 'Insert', 'parentSub': 'somekey', 'content': 4196},
-            {'id': ['131', 3], 'left': null, 'right': null, 'origin': null, 'parent': ['130', 0], 'struct': 'Insert', 'parentSub': 'somekey', 'content': 5022}
-          ] // eslint-disable-line
-
-          for (var o of ops) {
-            yield* this.store.tryExecute.call(this, o)
-          }
+      it('Debug after implementing "content is an array" (7)', async(function * (done) {
+        this.users[0].db.requestTransaction(function * () {
+          
         })
-        yield wait()
-        yield yconfig3.disconnect()
-        yield yconfig2.disconnect()
-        yield flushAll()
-        wait()
-        yield yconfig3.reconnect()
-        yield yconfig2.reconnect()
-        yield wait()
-        yield flushAll()
+        this.users[1].db.requestTransaction(function * () {
+          
+        })
+        yield wait(100)
+        debugger
+        yield compareAllUsers([this.users[0], this.users[1]])
         done()
       }))
-      it('debug right not existend in Insert.execute (2)', async(function * (done) {
-        yconfig1.db.requestTransaction(function * () {
-          yield* this.store.tryExecute.call(this, {'struct': 'Map', 'type': 'Map', 'id': ['153', 0], 'map': {}})
-          yield* this.store.tryExecute.call(this, {'id': ['153', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_root'], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['153', 0]})
-          yield* this.store.tryExecute.call(this, {'struct': 'Map', 'type': 'Map', 'id': ['153', 0], 'map': {}})
-          yield* this.store.tryExecute.call(this, {'id': ['153', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_root'], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['153', 0]})
-          yield* this.store.tryExecute.call(this, {'struct': 'Map', 'type': 'Map', 'id': ['153', 0], 'map': {}})
-          yield* this.store.tryExecute.call(this, {'id': ['153', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_root'], 'struct': 'Insert', 'parentSub': 'Map', 'opContent': ['153', 0]})
-          yield* this.store.tryExecute.call(this, {'left': null, 'right': null, 'origin': null, 'parent': ['153', 0], 'parentSub': 'somekey', 'struct': 'Insert', 'content': 3784, 'id': ['154', 0]})
-          yield* this.store.tryExecute.call(this, {'left': null, 'right': ['154', 0], 'origin': null, 'parent': ['153', 0], 'parentSub': 'somekey', 'struct': 'Insert', 'content': 8217, 'id': ['154', 1]})
-          yield* this.store.tryExecute.call(this, {'left': null, 'right': ['154', 1], 'origin': null, 'parent': ['153', 0], 'parentSub': 'somekey', 'struct': 'Insert', 'content': 5036, 'id': ['154', 2]})
-          yield* this.store.tryExecute.call(this, {'id': ['153', 2], 'left': null, 'right': null, 'origin': null, 'parent': ['153', 0], 'struct': 'Insert', 'parentSub': 'somekey', 'content': 417})
-          yield* this.store.tryExecute.call(this, {'id': ['155', 0], 'left': null, 'right': null, 'origin': null, 'parent': ['153', 0], 'struct': 'Insert', 'parentSub': 'somekey', 'content': 2202})
-          yield* this.garbageCollectOperation(['153', 2])
-          yield* this.garbageCollectOperation(['154', 0])
-          yield* this.garbageCollectOperation(['154', 1])
-          yield* this.garbageCollectOperation(['154', 2])
-          yield* this.garbageCollectOperation(['155', 0])
-          yield* this.garbageCollectOperation(['156', 0])
-          yield* this.garbageCollectOperation(['157', 0])
-          yield* this.garbageCollectOperation(['157', 1])
-          yield* this.store.tryExecute.call(this, {'id': ['153', 3], 'left': null, 'right': null, 'origin': null, 'parent': ['153', 0], 'struct': 'Insert', 'parentSub': 'somekey', 'content': 4372})
-        })
-        yield wait()
-        yield yconfig3.disconnect()
-        yield yconfig2.disconnect()
-        yield flushAll()
-        yield wait()
-        yield yconfig3.reconnect()
-        yield yconfig2.reconnect()
-        yield wait()
-        yield flushAll()
-        done()
-      }))*/
     })
     describeManyTimes(repeatArrayTests, `Random tests`, function () {
       var randomArrayTransactions = [
