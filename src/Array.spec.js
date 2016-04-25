@@ -5,15 +5,12 @@
 var Y = require('../../yjs/src/SpecHelper.js')
 
 function compareEvent (is, should) {
-  expect(is.length).toEqual(should.length)
-  for (var i = 0; i < is.length; i++) {
-    for (var key in should[i]) {
-      expect(should[i][key]).toEqual(is[i][key])
-    }
+  for (var key in should) {
+    expect(should[key]).toEqual(is[key])
   }
 }
 
-var numberOfYArrayTests = 8000
+var numberOfYArrayTests = 300
 var repeatArrayTests = 100
 
 for (let database of databases) {
@@ -184,26 +181,26 @@ for (let database of databases) {
           event = e
         })
         array.insert(0, [0, 1, 2])
-        compareEvent(event, [{
+        compareEvent(event, {
           type: 'insert',
           index: 0,
           values: [0, 1, 2],
           length: 3
-        }])
+        })
         array.delete(0)
-        compareEvent(event, [{
+        compareEvent(event, {
           type: 'delete',
           index: 0,
           length: 1,
           values: [0]
-        }])
+        })
         array.delete(0, 2)
-        compareEvent(event, [{
+        compareEvent(event, {
           type: 'delete',
           index: 0,
           length: 2,
           values: [1, 2]
-        }])
+        })
         yield wait(50)
         done()
       }))
@@ -214,23 +211,21 @@ for (let database of databases) {
           event = e
         })
         array.insert(0, [Y.Array])
-        delete event[0].values
-        compareEvent(event, [{
+        compareEvent(event, {
           type: 'insert',
           object: array,
           index: 0,
           length: 1
-        }])
+        })
         var type = yield array.get(0)
         expect(type._model).toBeTruthy()
         array.delete(0)
-        delete event[0].values
-        compareEvent(event, [{
+        compareEvent(event, {
           type: 'delete',
           object: array,
           index: 0,
           length: 1
-        }])
+        })
         yield wait(50)
         yield garbageCollectAllUsers(this.users)
         // expect(type._content == null).toBeTruthy() TODO: make sure everything is cleaned up!
@@ -238,33 +233,31 @@ for (let database of databases) {
       }))
       it('throw insert & delete events for types (2)', async(function * (done) {
         var array = yield this.users[0].share.root.set('array', Y.Array)
-        var event
+        var events = []
         array.observe(function (e) {
-          event = e
+          events.push(e)
         })
         array.insert(0, ['hi', Y.Map])
-        delete event[1].values
-        compareEvent(event, [{
+        compareEvent(events[0], {
           type: 'insert',
           object: array,
           index: 0,
           length: 1,
           values: ['hi']
-        },
-        {
+        })
+        compareEvent(events[1], {
           type: 'insert',
           object: array,
           index: 1,
           length: 1
-        }])
+        })
         array.delete(1)
-        delete event[0].values
-        compareEvent(event, [{
+        compareEvent(events[2], {
           type: 'delete',
           object: array,
           index: 1,
           length: 1
-        }])
+        })
         yield wait(50)
         done()
       }))

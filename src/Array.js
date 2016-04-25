@@ -8,83 +8,79 @@ function extend (Y) {
       this._model = _model
       // Array of all the neccessary content
       this._content = _content
-      this.eventHandler = new Y.utils.EventHandler(ops => {
-        var userEvents = []
-        ops.forEach(op => {
-          if (op.struct === 'Insert') {
-            let pos
-            // we check op.left only!,
-            // because op.right might not be defined when this is called
-            if (op.left === null) {
-              pos = 0
-            } else {
-              pos = 1 + this._content.findIndex(function (c) {
-                return Y.utils.compareIds(c.id, op.left)
-              })
-              if (pos <= 0) {
-                throw new Error('Unexpected operation!')
-              }
+      this.eventHandler = new Y.utils.EventHandler(op => {
+        if (op.struct === 'Insert') {
+          let pos
+          // we check op.left only!,
+          // because op.right might not be defined when this is called
+          if (op.left === null) {
+            pos = 0
+          } else {
+            pos = 1 + this._content.findIndex(function (c) {
+              return Y.utils.compareIds(c.id, op.left)
+            })
+            if (pos <= 0) {
+              throw new Error('Unexpected operation!')
             }
-            var values
-            var length
-            if (op.hasOwnProperty('opContent')) {
-              this._content.splice(pos, 0, {
-                id: op.id,
-                type: op.opContent
-              })
-              let opContent = op.opContent
-              length = 1
-              values = () => {
-                return new Promise(resolve => {
-                  this.os.requestTransaction(function *() {
-                    var type = yield* this.getType(opContent)
-                    resolve([type])
-                  })
+          }
+          var values
+          var length
+          if (op.hasOwnProperty('opContent')) {
+            this._content.splice(pos, 0, {
+              id: op.id,
+              type: op.opContent
+            })
+            let opContent = op.opContent
+            length = 1
+            values = () => {
+              return new Promise(resolve => {
+                this.os.requestTransaction(function *() {
+                  var type = yield* this.getType(opContent)
+                  resolve([type])
                 })
-              }
-            } else {
-              var contents = op.content.map(function (c, i) {
-                return {
-                  id: [op.id[0], op.id[1] + i],
-                  val: c
-                }
-              })
-              // insert value in _content
-              this._content.splice.apply(this._content, [pos, 0].concat(contents))
-              values = op.content
-              length = op.content.length
-            }
-            userEvents.push({
-              type: 'insert',
-              object: this,
-              index: pos,
-              values: values,
-              // valueId: valueId, // TODO: does this still work as expected?
-              length: length
-            })
-          } else if (op.struct === 'Delete') {
-            let pos = this._content.findIndex(function (c) {
-              return Y.utils.compareIds(c.id, op.target)
-            })
-            if (pos >= 0) {
-              let content = this._content.splice(pos, op.length || 1)
-              let values = content.map((c) => {
-                return c.val
-              })
-              userEvents.push({
-                type: 'delete',
-                object: this,
-                index: pos,
-                values: values,
-                _content: content,
-                length: op.length || 1
               })
             }
           } else {
-            throw new Error('Unexpected struct!')
+            var contents = op.content.map(function (c, i) {
+              return {
+                id: [op.id[0], op.id[1] + i],
+                val: c
+              }
+            })
+            // insert value in _content
+            this._content.splice.apply(this._content, [pos, 0].concat(contents))
+            values = op.content
+            length = op.content.length
           }
-        })
-        this.eventHandler.callEventListeners(userEvents)
+          this.eventHandler.callEventListeners({
+            type: 'insert',
+            object: this,
+            index: pos,
+            values: values,
+            // valueId: valueId, // TODO: does this still work as expected?
+            length: length
+          })
+        } else if (op.struct === 'Delete') {
+          let pos = this._content.findIndex(function (c) {
+            return Y.utils.compareIds(c.id, op.target)
+          })
+          if (pos >= 0) {
+            let content = this._content.splice(pos, op.length || 1)
+            let values = content.map((c) => {
+              return c.val
+            })
+            this.eventHandler.callEventListeners({
+              type: 'delete',
+              object: this,
+              index: pos,
+              values: values,
+              _content: content,
+              length: op.length || 1
+            })
+          }
+        } else {
+          throw new Error('Unexpected struct!')
+        }
       })
     }
     _destroy () {
