@@ -161,6 +161,8 @@ function extend (Y) {
           } else if (_content.length > 0) {
             i-- // come back again later
             break
+          } else {
+            break
           }
         }
         if (_content.length > 0) {
