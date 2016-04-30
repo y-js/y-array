@@ -4,14 +4,15 @@
 
 var Y = require('../../yjs/src/SpecHelper.js')
 
+
 function compareEvent (is, should) {
   for (var key in should) {
     expect(should[key]).toEqual(is[key])
   }
 }
 
-var numberOfYArrayTests = 300
-var repeatArrayTests = 100
+var numberOfYArrayTests = 30
+var repeatArrayTests = 10
 
 for (let database of databases) {
   describe(`Array Type (DB: ${database})`, function () {
