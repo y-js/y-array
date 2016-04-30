@@ -120,7 +120,7 @@ function extend (Y) {
       })
     }
     push (contents) {
-      this.insert(this._content.length, contents)
+      return this.insert(this._content.length, contents)
     }
     insert (pos, contents) {
       if (typeof pos !== 'number') {
