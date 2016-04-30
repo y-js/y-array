@@ -4,7 +4,6 @@
 
 var Y = require('../../yjs/src/SpecHelper.js')
 
-
 function compareEvent (is, should) {
   for (var key in should) {
     expect(should[key]).toEqual(is[key])
