@@ -1,4 +1,4 @@
-/* global createUsers, databases, wait, compareAllUsers, getRandom, getRandomNumber, applyRandomTransactionsNoGCNoDisconnect, applyRandomTransactionsAllRejoinNoGC, applyRandomTransactionsWithGC, async, garbageCollectAllUsers, describeManyTimes */
+/* global createUsers, databases, wait, fixAwaitingInType, compareAllUsers, getRandom, getRandomNumber, applyRandomTransactionsNoGCNoDisconnect, applyRandomTransactionsAllRejoinNoGC, applyRandomTransactionsWithGC, async, garbageCollectAllUsers, describeManyTimes */
 /* eslint-env browser,jasmine */
 'use strict'
 
@@ -10,11 +10,23 @@ function compareEvent (is, should) {
   }
 }
 
-var numberOfYArrayTests = 10
+function compareArrayValues (arrays) {
+  var firstArray
+  for (var l of arrays) {
+    var val = l.toArray()
+    if (firstArray == null) {
+      firstArray = val
+    } else {
+      expect(val).toEqual(firstArray)
+    }
+  }
+}
+
+var numberOfYArrayTests = 50
 var repeatArrayTests = 20
 
 for (let database of databases) {
-  if (database !== 'memory') continue // TODO: REMOVE
+  // if (database === 'memory') continue // TODO: REMOVE
   describe(`Array Type (DB: ${database})`, function () {
     var y1, y2, y3, yconfig1, yconfig2, yconfig3, flushAll
 
@@ -538,16 +550,15 @@ for (let database of databases) {
         done()
       }))
     })
-    describeManyTimes(repeatArrayTests, `Random tests`, function () {
-      function fixAwaitingInType (array) {
-        array.eventHandler._tryCallEvents(array.eventHandler.awaiting)
-      }
+    describeManyTimes(repeatArrayTests, 'Random tests', function () {
       var randomArrayTransactions = [
         function concurrentUserInteraction (array) {
-          if (array.eventHandler.awaiting === 0) {
+          if (array.eventHandler.awaiting === 0 && array.eventHandler._debuggingAwaiting !== true) {
             array.eventHandler.awaiting = 1
+            array.eventHandler._debuggingAwaiting = true
           } else {
-            fixAwaitingInType(array)
+            // fixAwaitingInType will handle _debuggingAwaiting
+            return fixAwaitingInType(array)
           }
         },
         function insert (array) {
@@ -576,7 +587,6 @@ for (let database of databases) {
           })
         },
         function _delete (array) {
-          // TODO, delete more than one!
           var length = array._content.length
           if (length > 0) {
             var pos = getRandomNumber(length)
@@ -603,17 +613,6 @@ for (let database of databases) {
           }
         }
       ]
-      function compareArrayValues (arrays) {
-        var firstArray
-        for (var l of arrays) {
-          var val = l.toArray()
-          if (firstArray == null) {
-            firstArray = val
-          } else {
-            expect(val).toEqual(firstArray)
-          }
-        }
-      }
       beforeEach(async(function * (done) {
         yield this.users[0].share.root.set('Array', Y.Array)
         yield flushAll()
@@ -632,7 +631,7 @@ for (let database of databases) {
       it(`succeed after ${numberOfYArrayTests} actions, no GC, no disconnect`, async(function * (done) {
         yield applyRandomTransactionsNoGCNoDisconnect(this.users, this.arrays, randomArrayTransactions, numberOfYArrayTests)
         yield flushAll()
-        this.arrays.forEach(fixAwaitingInType)
+        yield Promise.all(this.arrays.map(fixAwaitingInType))
         yield compareArrayValues(this.arrays)
         yield compareAllUsers(this.users)
         done()
@@ -640,7 +639,7 @@ for (let database of databases) {
       it(`succeed after ${numberOfYArrayTests} actions, no GC, all users disconnecting/reconnecting`, async(function * (done) {
         yield applyRandomTransactionsAllRejoinNoGC(this.users, this.arrays, randomArrayTransactions, numberOfYArrayTests)
         yield flushAll()
-        this.arrays.forEach(fixAwaitingInType)
+        yield Promise.all(this.arrays.map(fixAwaitingInType))
         yield compareArrayValues(this.arrays)
         yield compareAllUsers(this.users)
         done()
@@ -648,7 +647,7 @@ for (let database of databases) {
       it(`succeed after ${numberOfYArrayTests} actions, GC, user[0] is not disconnecting`, async(function * (done) {
         yield applyRandomTransactionsWithGC(this.users, this.arrays, randomArrayTransactions, numberOfYArrayTests)
         yield flushAll()
-        this.arrays.forEach(fixAwaitingInType)
+        yield Promise.all(this.arrays.map(fixAwaitingInType))
         yield compareArrayValues(this.arrays)
         yield compareAllUsers(this.users)
         done()

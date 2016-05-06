@@ -8,7 +8,7 @@ function extend (Y) {
       this._model = _model
       // Array of all the neccessary content
       this._content = _content
-      this.eventHandler = new Y.utils.EventHandler(op => {
+      this.eventHandler = new Y.utils.EventHandler((op) => {
         if (op.struct === 'Insert') {
           let pos
           // we check op.left only!,
@@ -33,7 +33,7 @@ function extend (Y) {
             let opContent = op.opContent
             length = 1
             values = () => {
-              return new Promise(resolve => {
+              return new Promise((resolve) => {
                 this.os.requestTransaction(function *() {
                   var type = yield* this.getType(opContent)
                   resolve([type])
@@ -61,22 +61,38 @@ function extend (Y) {
             length: length
           })
         } else if (op.struct === 'Delete') {
-          let pos = this._content.findIndex(function (c) {
-            return Y.utils.compareIds(c.id, op.target)
-          })
-          if (pos >= 0) {
-            let content = this._content.splice(pos, op.length || 1)
-            let values = content.map((c) => {
-              return c.val
-            })
-            this.eventHandler.callEventListeners({
-              type: 'delete',
-              object: this,
-              index: pos,
-              values: values,
-              _content: content,
-              length: op.length || 1
-            })
+          var i = 0 // current position in _content
+          for (; i < this._content.length && op.length > 0; i++) {
+            var c = this._content[i]
+            if (Y.utils.inDeletionRange(op, c.id)) {
+              // is in deletion range!
+              var delLength
+              // check how many character to delete in one flush
+              for (delLength = 1;
+                    delLength < op.length && i + delLength < this._content.length && Y.utils.inDeletionRange(op, this._content[i + delLength].id);
+                    delLength++) {}
+              // last operation thas will be deleted
+              c = this._content[i + delLength - 1]
+              // update delete operation
+              op.length -= c.id[1] - op.target[1] + 1
+              op.target = [c.id[0], c.id[1] + 1]
+              // apply deletion & find send event
+              let content = this._content.splice(i, delLength)
+              // TODO: how about return types
+              let values = content.map(function (c) { return c.val })
+              this.eventHandler.callEventListeners({
+                type: 'delete',
+                object: this,
+                index: i,
+                values: values,
+                _content: content,
+                length: delLength
+              })
+              // with the fresh delete op, we can continue
+              // note: we don't have to increment i, because the i-th content was deleted
+              // but on the other had, the (i+delLength)-th was not in deletion range
+              // So we don't do i--
+            }
           }
         } else {
           throw new Error('Unexpected struct!')
@@ -139,7 +155,6 @@ function extend (Y) {
       var ops = []
       var newTypes = []
       var prevId = mostLeft
-      // TODOː use new content_s_ feature. don't iterate
       for (var i = 0; i < contents.length;) {
         var op = {
           left: prevId,
@@ -180,6 +195,7 @@ function extend (Y) {
         prevId = op.id
       }
       var eventHandler = this.eventHandler
+      eventHandler.awaitAndPrematurelyCall(ops)
       this.os.requestTransaction(function *() {
         // now we can set the right reference.
         var mostRight
@@ -196,10 +212,10 @@ function extend (Y) {
           var op = ops[j]
           op.right = mostRight
         }
+        var beforeExecution = eventHandler.waiting.length
         yield* this.applyCreatedOperations(ops)
-        eventHandler.awaitedInserts(ops.length)
+        yield* eventHandler.awaitedOps(this, eventHandler.waiting.length - beforeExecution)
       })
-      eventHandler.awaitAndPrematurelyCall(ops)
     }
     delete (pos, length) {
       if (length == null) { length = 1 }
@@ -216,7 +232,6 @@ function extend (Y) {
         return
       }
       var eventHandler = this.eventHandler
-      var newLeft = pos > 0 ? this._content[pos - 1].id : null
       var dels = []
       for (var i = 0; i < length; i = i + delLength) {
         var targetId = this._content[pos + i].id
@@ -235,8 +250,10 @@ function extend (Y) {
       }
       eventHandler.awaitAndPrematurelyCall(dels)
       this.os.requestTransaction(function *() {
+        var beforeExecution = eventHandler.waiting.length
         yield* this.applyCreatedOperations(dels)
-        eventHandler.awaitedDeletes(dels.length, newLeft)
+        // awaited all applied operaitons
+        yield* eventHandler.awaitedOps(this, eventHandler.waiting.length - beforeExecution)
       })
     }
     observe (f) {
