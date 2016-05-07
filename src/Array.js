@@ -212,9 +212,7 @@ function extend (Y) {
           var op = ops[j]
           op.right = mostRight
         }
-        var beforeExecution = eventHandler.waiting.length
-        yield* this.applyCreatedOperations(ops)
-        yield* eventHandler.awaitedOps(this, eventHandler.waiting.length - beforeExecution)
+        yield* eventHandler.awaitOps(this, this.applyCreatedOperations, [ops])
       })
     }
     delete (pos, length) {
@@ -250,10 +248,7 @@ function extend (Y) {
       }
       eventHandler.awaitAndPrematurelyCall(dels)
       this.os.requestTransaction(function *() {
-        var beforeExecution = eventHandler.waiting.length
-        yield* this.applyCreatedOperations(dels)
-        // awaited all applied operaitons
-        yield* eventHandler.awaitedOps(this, eventHandler.waiting.length - beforeExecution)
+        yield* eventHandler.awaitOps(this, this.applyCreatedOperations, [dels])
       })
     }
     observe (f) {

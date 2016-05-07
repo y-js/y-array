@@ -552,15 +552,6 @@ for (let database of databases) {
     })
     describeManyTimes(repeatArrayTests, 'Random tests', function () {
       var randomArrayTransactions = [
-        function concurrentUserInteraction (array) {
-          if (array.eventHandler.awaiting === 0 && array.eventHandler._debuggingAwaiting !== true) {
-            array.eventHandler.awaiting = 1
-            array.eventHandler._debuggingAwaiting = true
-          } else {
-            // fixAwaitingInType will handle _debuggingAwaiting
-            return fixAwaitingInType(array)
-          }
-        },
         function insert (array) {
           var c = getRandomNumber()
           var content = []
