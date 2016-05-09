@@ -23,7 +23,7 @@ function compareArrayValues (arrays) {
 }
 
 var numberOfYArrayTests = 50
-var repeatArrayTests = 20
+var repeatArrayTests = 5
 
 for (let database of databases) {
   // if (database === 'memory') continue // TODO: REMOVE
