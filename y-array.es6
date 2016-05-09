@@ -196,7 +196,6 @@ function extend (Y) {
         prevId = op.id
       }
       var eventHandler = this.eventHandler
-      eventHandler.awaitAndPrematurelyCall(ops)
       this.os.requestTransaction(function *() {
         // now we can set the right reference.
         var mostRight
@@ -215,6 +214,7 @@ function extend (Y) {
         }
         yield* eventHandler.awaitOps(this, this.applyCreatedOperations, [ops])
       })
+      eventHandler.awaitAndPrematurelyCall(ops)
     }
     delete (pos, length) {
       if (length == null) { length = 1 }
