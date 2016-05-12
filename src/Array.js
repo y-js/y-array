@@ -213,6 +213,8 @@ function extend (Y) {
         }
         yield* eventHandler.awaitOps(this, this.applyCreatedOperations, [ops])
       })
+      // always remember to do that after this.os.requestTransaction
+      // (otherwise values might contain a undefined reference to type)
       eventHandler.awaitAndPrematurelyCall(ops)
     }
     delete (pos, length) {
@@ -246,10 +248,12 @@ function extend (Y) {
           length: delLength
         })
       }
-      eventHandler.awaitAndPrematurelyCall(dels)
       this.os.requestTransaction(function *() {
         yield* eventHandler.awaitOps(this, this.applyCreatedOperations, [dels])
       })
+      // always remember to do that after this.os.requestTransaction
+      // (otherwise values might contain a undefined reference to type)
+      eventHandler.awaitAndPrematurelyCall(dels)
     }
     observe (f) {
       this.eventHandler.addEventListener(f)
