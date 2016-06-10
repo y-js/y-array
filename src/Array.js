@@ -8,7 +8,9 @@ function extend (Y) {
       this._model = _model
       // Array of all the neccessary content
       this._content = _content
+      this._debugEvents = [] // TODO: remove!!
       this.eventHandler = new Y.utils.EventHandler((op) => {
+        this._debugEvents.push(JSON.parse(JSON.stringify(op)))
         if (op.struct === 'Insert') {
           let pos
           // we check op.left only!,
@@ -71,7 +73,7 @@ function extend (Y) {
               for (delLength = 1;
                     delLength < op.length && i + delLength < this._content.length && Y.utils.inDeletionRange(op, this._content[i + delLength].id);
                     delLength++) {}
-              // last operation thas will be deleted
+              // last operation that will be deleted
               c = this._content[i + delLength - 1]
               // update delete operation
               op.length -= c.id[1] - op.target[1] + 1

@@ -22,11 +22,11 @@ function compareArrayValues (arrays) {
   }
 }
 
-var numberOfYArrayTests = 50
-var repeatArrayTests = 5
+var numberOfYArrayTests = 10
+var repeatArrayTests = 5000
 
 for (let database of databases) {
-  // if (database === 'memory') continue // TODO: REMOVE
+  if (database !== 'memory') continue // TODO: REMOVE
   describe(`Array Type (DB: ${database})`, function () {
     var y1, y2, y3, yconfig1, yconfig2, yconfig3, flushAll
 
@@ -619,12 +619,12 @@ for (let database of databases) {
         expect(this.arrays.length).toEqual(this.users.length)
         done()
       }))
-      it(`succeed after ${numberOfYArrayTests} actions, no GC, no disconnect`, async(function * (done) {
+      iit(`succeed after ${numberOfYArrayTests} actions, no GC, no disconnect`, async(function * (done) {
         yield applyRandomTransactionsNoGCNoDisconnect(this.users, this.arrays, randomArrayTransactions, numberOfYArrayTests)
         yield flushAll()
         yield Promise.all(this.arrays.map(fixAwaitingInType))
-        yield compareArrayValues(this.arrays)
         yield compareAllUsers(this.users)
+        yield compareArrayValues(this.arrays)
         done()
       }))
       it(`succeed after ${numberOfYArrayTests} actions, no GC, all users disconnecting/reconnecting`, async(function * (done) {
