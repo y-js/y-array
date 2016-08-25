@@ -37,7 +37,7 @@ function extend (Y) {
             values = () => {
               return new Promise((resolve) => {
                 this.os.requestTransaction(function *() {
-                  var type = yield* this.getType(opContent)
+                  var type = yield* this.store.getType.call(this, opContent)
                   resolve([type])
                 })
               })
@@ -124,7 +124,7 @@ function extend (Y) {
         var oid = this._content[pos].type
         return new Promise((resolve) => {
           this.os.requestTransaction(function *() {
-            var type = yield* this.getType(oid)
+            var type = yield* this.store.getType.call(this, oid)
             resolve(type)
           })
         })
@@ -207,7 +207,7 @@ function extend (Y) {
           mostRight = (yield* this.getOperation(ops[0].parent)).start
         }
         for (var i = 0; i < newTypes.length; i++) {
-          yield* this.createType.apply(this, newTypes[i])
+          this.store.createType(newTypes[i])
         }
         for (var j = 0; j < ops.length; j++) {
           var op = ops[j]
@@ -304,6 +304,9 @@ function extend (Y) {
         }
       })
       return new YArray(os, model.id, _content)
+    },
+    createNewType: function YArrayCreateNewType (os, model) {
+      return new YArray(os, model.id, [])
     }
   }))
 }
