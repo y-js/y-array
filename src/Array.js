@@ -2,15 +2,16 @@
 'use strict'
 
 function extend (Y) {
-  class YArray {
+  class YArray extends Y.utils.CustomType {
     constructor (os, _model, _content) {
+      super()
       this.os = os
       this._model = _model
       // Array of all the neccessary content
       this._content = _content
-      this._debugEvents = [] // TODO: remove!!
+      this._debugEvents = [] // TODO: remove!! 
       this.eventHandler = new Y.utils.EventHandler((op) => {
-        this._debugEvents.push(JSON.parse(JSON.stringify(op)))
+        this._debugEvents.push(JSON.parse(JSON.stringify(op))) 
         if (op.struct === 'Insert') {
           let pos
           // we check op.left only!,
@@ -32,16 +33,8 @@ function extend (Y) {
               id: op.id,
               type: op.opContent
             })
-            let opContent = op.opContent
             length = 1
-            values = () => {
-              return new Promise((resolve) => {
-                this.os.requestTransaction(function *() {
-                  var type = yield* this.store.getType.call(this, opContent)
-                  resolve([type])
-                })
-              })
-            }
+            values = this.os.getType(op.opContent)
           } else {
             var contents = op.content.map(function (c, i) {
               return {
@@ -121,13 +114,7 @@ function extend (Y) {
       if (this._content[pos].type == null) {
         return this._content[pos].val
       } else {
-        var oid = this._content[pos].type
-        return new Promise((resolve) => {
-          this.os.requestTransaction(function *() {
-            var type = yield* this.store.getType.call(this, oid)
-            resolve(type)
-          })
-        })
+        return this.os.getType(this._content[pos].type)
       }
     }
     // only returns primitive values
@@ -155,7 +142,6 @@ function extend (Y) {
       var mostLeft = pos === 0 ? null : this._content[pos - 1].id
 
       var ops = []
-      var newTypes = []
       var prevId = mostLeft
       for (var i = 0; i < contents.length;) {
         var op = {
@@ -189,7 +175,7 @@ function extend (Y) {
         } else {
           // otherwise its a type
           var typeid = this.os.getNextOpId(1)
-          newTypes.push([typeDefinition, typeid])
+          this.os.createType(typeDefinition, typeid)
           op.opContent = typeid
           op.id = this.os.getNextOpId(1)
         }
@@ -205,9 +191,6 @@ function extend (Y) {
           mostRight = ml.right
         } else {
           mostRight = (yield* this.getOperation(ops[0].parent)).start
-        }
-        for (var i = 0; i < newTypes.length; i++) {
-          this.store.createType(newTypes[i])
         }
         for (var j = 0; j < ops.length; j++) {
           var op = ops[j]
@@ -266,6 +249,7 @@ function extend (Y) {
     * _changed (transaction, op) {
       if (!op.deleted) {
         if (op.struct === 'Insert') {
+          // update left
           var l = op.left
           var left
           while (l != null) {
@@ -276,13 +260,17 @@ function extend (Y) {
             l = left.left
           }
           op.left = l
+          // if op contains opContent, initialize it
+          if (op.opContent != null) {
+            yield* transaction.store.initType.call(transaction, op.opContent)
+          }
         }
         this.eventHandler.receivedOp(op)
       }
     }
   }
 
-  Y.extend('Array', new Y.utils.CustomType({
+  Y.extend('Array', new Y.utils.CustomTypeDefinition({
     name: 'Array',
     class: YArray,
     struct: 'List',
@@ -305,7 +293,7 @@ function extend (Y) {
       })
       return new YArray(os, model.id, _content)
     },
-    createNewType: function YArrayCreateNewType (os, model) {
+    createType: function YArrayCreateType (os, model) {
       return new YArray(os, model.id, [])
     }
   }))

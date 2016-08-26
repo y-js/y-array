@@ -564,18 +564,16 @@ for (let database of databases) {
         function insertTypeArray (array) {
           var pos = getRandomNumber(array.toArray().length + 1)
           array.insert(pos, [Y.Array])
-          array.get(pos).then(function (array) {
-            array.insert(0, [1, 2, 3, 4])
-          })
+          var array2 = array.get(pos)
+          array2.insert(0, [1, 2, 3, 4])
         },
         function insertTypeMap (array) {
           var pos = getRandomNumber(array.toArray().length + 1)
           array.insert(pos, [Y.Map])
-          array.get(pos).then(function (map) {
-            map.set('someprop', 42)
-            map.set('someprop', 43)
-            map.set('someprop', 44)
-          })
+          var map = array.get(pos)
+          map.set('someprop', 42)
+          map.set('someprop', 43)
+          map.set('someprop', 44)
         },
         function _delete (array) {
           var length = array._content.length
@@ -584,17 +582,16 @@ for (let database of databases) {
             var delLength = getRandom([getRandomNumber(length - pos) + 1, 1])
             if (array._content[pos].type != null) {
               if (getRandomNumber(2) === 1) {
-                array.get(pos).then(function (type) {
-                  if (type instanceof Y.Array.typeDefinition.class) {
-                    if (type._content.length > 0) {
-                      var pos = getRandomNumber(type._content.length)
-                      var delLength = getRandom([getRandomNumber(type._content.length - pos) + 1, 1])
-                      type.delete(pos, delLength)
-                    }
-                  } else {
-                    type.delete('someprop')
+                var type = array.get(pos)
+                if (type instanceof Y.Array.typeDefinition.class) {
+                  if (type._content.length > 0) {
+                    var pos = getRandomNumber(type._content.length)
+                    var delLength = getRandom([getRandomNumber(type._content.length - pos) + 1, 1])
+                    type.delete(pos, delLength)
                   }
-                })
+                } else {
+                  type.delete('someprop')
+                }
               } else {
                 array.delete(pos, delLength)
               }
