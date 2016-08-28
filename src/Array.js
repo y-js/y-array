@@ -34,7 +34,7 @@ function extend (Y) {
               type: op.opContent
             })
             length = 1
-            values = this.os.getType(op.opContent)
+            values = [this.os.getType(op.opContent)]
           } else {
             var contents = op.content.map(function (c, i) {
               return {
