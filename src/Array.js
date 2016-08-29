@@ -276,12 +276,14 @@ function extend (Y) {
     struct: 'List',
     initType: function * YArrayInitializer (os, model) {
       var _content = []
+      var _types = []
       yield* Y.Struct.List.map.call(this, model, function (op) {
         if (op.hasOwnProperty('opContent')) {
           _content.push({
             id: op.id,
             type: op.opContent
           })
+          _types.push(op.opContent)
         } else {
           op.content.forEach(function (c, i) {
             _content.push({
@@ -291,6 +293,9 @@ function extend (Y) {
           })
         }
       })
+      for (var i = 0; i < _types.length; i++) {
+        yield* this.store.initType.call(this, _types[i])
+      }
       return new YArray(os, model.id, _content)
     },
     createType: function YArrayCreateType (os, model) {
