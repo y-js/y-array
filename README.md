@@ -1,7 +1,7 @@
-
 # Array Type for [Yjs](https://github.com/y-js/yjs)
 
-This plugins provides a shareable Array type. You can insert and delete objects in y-array. The objects must either be a custom types, or fulfill the following property: `v equals JSON.parse(JSON.stringify(v))` 
+This plugins provides a shareable Array type. You can insert and delete objects in y-array. The objects must either be a custom type,
+or fulfill the following property: `v equals JSON.parse(JSON.stringify(v))` (according to your definition of equality) 
 
 ## Use it!
 Install this with bower or npm.
@@ -44,7 +44,7 @@ npm install y-array --save
 
 
 # A note on intention preservation
-If two users insert something at the same position concurrently, the content that was inserted by the user with the higher user-id will be to the right of the other content. In the OT world we often speak of *intention preservation*, which is very loosely defined in most cases. This type has the following notion of intention preservation: When a user inserts content *c* after a set of content *C_left*, and before a set of content *C_right*, then *C_left* will be always to the left of c, and *C_right* will be always to the right of *c*. This property will also hold when content is deleted or when a deletion is undone.
+If two users insert something at the same position concurrently, the content that was inserted by the user with the higher user-id will be to the right of the other content. In the OT world we often speak of *intention preservation*, which is very loosely defined in most cases. This type has the following notion of intention preservation: When a user inserts content *c* after a set of content *C_left*, and before a set of content *C_right*, then *C_left* will be always to the left of c, and *C_right* will be always to the right of *c*. Since content is only marked as deleted (until all conflicts are resolved), this notion of intention preservation is very strong.
 
 # A note on time complexities
 * .insert(position, content)
@@ -72,4 +72,4 @@ If two users insert something at the same position concurrently, the content tha
 ## License
 Yjs is licensed under the [MIT License](./LICENSE).
 
-<kevin.jahns@rwth-aachen.de>
+<kevin.jahns@rwth-aachen.de>model.id[0] === '_'
