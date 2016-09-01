@@ -9,9 +9,9 @@ function extend (Y) {
       this._model = _model
       // Array of all the neccessary content
       this._content = _content
-      this._debugEvents = [] // TODO: remove!! 
+      // this._debugEvents = [] // TODO: remove!!
       this.eventHandler = new Y.utils.EventHandler((op) => {
-        this._debugEvents.push(JSON.parse(JSON.stringify(op))) 
+        // this._debugEvents.push(JSON.parse(JSON.stringify(op)))
         if (op.struct === 'Insert') {
           let pos
           // we check op.left only!,
@@ -52,7 +52,6 @@ function extend (Y) {
             object: this,
             index: pos,
             values: values,
-            // valueId: valueId, // TODO: does this still work as expected?
             length: length
           })
         } else if (op.struct === 'Delete') {
@@ -73,8 +72,13 @@ function extend (Y) {
               op.target = [c.id[0], c.id[1] + 1]
               // apply deletion & find send event
               let content = this._content.splice(i, delLength)
-              // TODO: how about return types
-              let values = content.map(function (c) { return c.val })
+              let values = content.map((c) => {
+                if (c.val != null) {
+                  return c.val
+                } else {
+                  return this.os.getType(c.type)
+                }
+              })
               this.eventHandler.callEventListeners({
                 type: 'delete',
                 object: this,

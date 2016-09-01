@@ -22,8 +22,8 @@ function compareArrayValues (arrays) {
   }
 }
 
-var numberOfYArrayTests = 10
-var repeatArrayTests = 5000
+var numberOfYArrayTests = 70
+var repeatArrayTests = 3
 
 for (let database of databases) {
   if (database !== 'memory') continue // TODO: REMOVE
@@ -585,8 +585,8 @@ for (let database of databases) {
                 var type = array.get(pos)
                 if (type instanceof Y.Array.typeDefinition.class) {
                   if (type._content.length > 0) {
-                    var pos = getRandomNumber(type._content.length)
-                    var delLength = getRandom([getRandomNumber(type._content.length - pos) + 1, 1])
+                    pos = getRandomNumber(type._content.length)
+                    delLength = getRandom([getRandomNumber(type._content.length - pos) + 1, 1])
                     type.delete(pos, delLength)
                   }
                 } else {
@@ -616,7 +616,7 @@ for (let database of databases) {
         expect(this.arrays.length).toEqual(this.users.length)
         done()
       }))
-      iit(`succeed after ${numberOfYArrayTests} actions, no GC, no disconnect`, async(function * (done) {
+      it(`succeed after ${numberOfYArrayTests} actions, no GC, no disconnect`, async(function * (done) {
         yield applyRandomTransactionsNoGCNoDisconnect(this.users, this.arrays, randomArrayTransactions, numberOfYArrayTests)
         yield flushAll()
         yield Promise.all(this.arrays.map(fixAwaitingInType))

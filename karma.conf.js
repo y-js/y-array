@@ -3,7 +3,6 @@
 
 module.exports = function (config) {
   config.set({
-    client: { args: ['--grep', 'IndexedDBuiaeuiae'] },
     basePath: '',
     frameworks: ['jasmine', 'browserify'],
     files: [
