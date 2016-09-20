@@ -3,13 +3,16 @@
 'use strict'
 
 function extend (Y) {
-  class YArray {
+  class YArray extends Y.utils.CustomType {
     constructor (os, _model, _content) {
+      super()
       this.os = os
       this._model = _model
       // Array of all the neccessary content
       this._content = _content
+      // this._debugEvents = [] // TODO: remove!!
       this.eventHandler = new Y.utils.EventHandler((op) => {
+        // this._debugEvents.push(JSON.parse(JSON.stringify(op)))
         if (op.struct === 'Insert') {
           let pos
           // we check op.left only!,
@@ -31,16 +34,8 @@ function extend (Y) {
               id: op.id,
               type: op.opContent
             })
-            let opContent = op.opContent
             length = 1
-            values = () => {
-              return new Promise((resolve) => {
-                this.os.requestTransaction(function *() {
-                  var type = yield* this.getType(opContent)
-                  resolve([type])
-                })
-              })
-            }
+            values = [this.os.getType(op.opContent)]
           } else {
             var contents = op.content.map(function (c, i) {
               return {
@@ -58,7 +53,6 @@ function extend (Y) {
             object: this,
             index: pos,
             values: values,
-            // valueId: valueId, // TODO: does this still work as expected?
             length: length
           })
         } else if (op.struct === 'Delete') {
@@ -72,15 +66,20 @@ function extend (Y) {
               for (delLength = 1;
                     delLength < op.length && i + delLength < this._content.length && Y.utils.inDeletionRange(op, this._content[i + delLength].id);
                     delLength++) {}
-              // last operation thas will be deleted
+              // last operation that will be deleted
               c = this._content[i + delLength - 1]
               // update delete operation
               op.length -= c.id[1] - op.target[1] + 1
               op.target = [c.id[0], c.id[1] + 1]
               // apply deletion & find send event
               let content = this._content.splice(i, delLength)
-              // TODO: how about return types
-              let values = content.map(function (c) { return c.val })
+              let values = content.map((c) => {
+                if (c.val != null) {
+                  return c.val
+                } else {
+                  return this.os.getType(c.type)
+                }
+              })
               this.eventHandler.callEventListeners({
                 type: 'delete',
                 object: this,
@@ -120,13 +119,7 @@ function extend (Y) {
       if (this._content[pos].type == null) {
         return this._content[pos].val
       } else {
-        var oid = this._content[pos].type
-        return new Promise((resolve) => {
-          this.os.requestTransaction(function *() {
-            var type = yield* this.getType(oid)
-            resolve(type)
-          })
-        })
+        return this.os.getType(this._content[pos].type)
       }
     }
     // only returns primitive values
@@ -154,7 +147,6 @@ function extend (Y) {
       var mostLeft = pos === 0 ? null : this._content[pos - 1].id
 
       var ops = []
-      var newTypes = []
       var prevId = mostLeft
       for (var i = 0; i < contents.length;) {
         var op = {
@@ -188,7 +180,7 @@ function extend (Y) {
         } else {
           // otherwise its a type
           var typeid = this.os.getNextOpId(1)
-          newTypes.push([typeDefinition, typeid])
+          this.os.createType(typeDefinition, typeid)
           op.opContent = typeid
           op.id = this.os.getNextOpId(1)
         }
@@ -205,15 +197,14 @@ function extend (Y) {
         } else {
           mostRight = (yield* this.getOperation(ops[0].parent)).start
         }
-        for (var i = 0; i < newTypes.length; i++) {
-          yield* this.createType.apply(this, newTypes[i])
-        }
         for (var j = 0; j < ops.length; j++) {
           var op = ops[j]
           op.right = mostRight
         }
         yield* eventHandler.awaitOps(this, this.applyCreatedOperations, [ops])
       })
+      // always remember to do that after this.os.requestTransaction
+      // (otherwise values might contain a undefined reference to type)
       eventHandler.awaitAndPrematurelyCall(ops)
     }
     delete (pos, length) {
@@ -247,10 +238,12 @@ function extend (Y) {
           length: delLength
         })
       }
-      eventHandler.awaitAndPrematurelyCall(dels)
       this.os.requestTransaction(function *() {
         yield* eventHandler.awaitOps(this, this.applyCreatedOperations, [dels])
       })
+      // always remember to do that after this.os.requestTransaction
+      // (otherwise values might contain a undefined reference to type)
+      eventHandler.awaitAndPrematurelyCall(dels)
     }
     observe (f) {
       this.eventHandler.addEventListener(f)
@@ -261,6 +254,7 @@ function extend (Y) {
     * _changed (transaction, op) {
       if (!op.deleted) {
         if (op.struct === 'Insert') {
+          // update left
           var l = op.left
           var left
           while (l != null) {
@@ -271,24 +265,30 @@ function extend (Y) {
             l = left.left
           }
           op.left = l
+          // if op contains opContent, initialize it
+          if (op.opContent != null) {
+            yield* transaction.store.initType.call(transaction, op.opContent)
+          }
         }
         this.eventHandler.receivedOp(op)
       }
     }
   }
 
-  Y.extend('Array', new Y.utils.CustomType({
+  Y.extend('Array', new Y.utils.CustomTypeDefinition({
     name: 'Array',
     class: YArray,
     struct: 'List',
     initType: function * YArrayInitializer (os, model) {
       var _content = []
+      var _types = []
       yield* Y.Struct.List.map.call(this, model, function (op) {
         if (op.hasOwnProperty('opContent')) {
           _content.push({
             id: op.id,
             type: op.opContent
           })
+          _types.push(op.opContent)
         } else {
           op.content.forEach(function (c, i) {
             _content.push({
@@ -298,7 +298,13 @@ function extend (Y) {
           })
         }
       })
+      for (var i = 0; i < _types.length; i++) {
+        yield* this.store.initType.call(this, _types[i])
+      }
       return new YArray(os, model.id, _content)
+    },
+    createType: function YArrayCreateType (os, model) {
+      return new YArray(os, model.id, [])
     }
   }))
 }
