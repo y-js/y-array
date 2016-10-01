@@ -13,7 +13,13 @@ function compareEvent (is, should) {
 function compareArrayValues (arrays) {
   var firstArray
   for (var l of arrays) {
-    var val = l.toArray()
+    var val = l.toArray().map(function (a) {
+      if (a != null && a._model != null) {
+        return a._model // Comparing model id should suffice. We check correctnes of maps in map.spec.js
+      } else {
+        return a
+      }
+    })
     if (firstArray == null) {
       firstArray = val
     } else {
@@ -547,6 +553,60 @@ for (let database of databases) {
         })
         yield flushAll()
         yield compareAllUsers([this.users[0], this.users[1]])
+        done()
+      }))
+      it('event has correct value when setting a primitive on a YArray (same user)', async(function * (done) {
+        var event
+        var l1 = y1.set('array', Y.Array)
+        yield flushAll()
+        l1.observe(function (e) {
+          event = e
+        })
+        yield l1.insert(0, ['stuff'])
+        expect(event.values[0]).toEqual(event.object.get(0))
+        expect(event.values[0]).toEqual('stuff')
+        expect(event.values[0]).toEqual(l1.toArray()[0])
+        done()
+      }))
+      it('event has correct value when setting a primitive on a YArray (received from another user)', async(function * (done) {
+        var event
+        var l1 = y1.set('array', Y.Array)
+        yield flushAll()
+        l1.observe(function (e) {
+          event = e
+        })
+        yield y2.get('array').insert(0, ['stuff'])
+        yield flushAll()
+        expect(event.values[0]).toEqual(event.object.get(0))
+        expect(event.values[0]).toEqual('stuff')
+        expect(event.values[0]).toEqual(l1.toArray()[0])
+        done()
+      }))
+      it('event has correct value when setting a type on a YArray (same user)', async(function * (done) {
+        var event
+        var l1 = y1.set('array', Y.Array)
+        yield flushAll()
+        l1.observe(function (e) {
+          event = e
+        })
+        yield l1.insert(0, [Y.Array])
+        expect(event.values[0]).toEqual(event.object.get(0))
+        expect(event.values[0] != null).toBeTruthy()
+        expect(event.values[0]).toEqual(l1.toArray()[0])
+        done()
+      }))
+      it('event has correct value when setting a type on a YArray (ops received from another user)', async(function * (done) {
+        var event
+        var l1 = y1.set('array', Y.Array)
+        yield flushAll()
+        l1.observe(function (e) {
+          event = e
+        })
+        yield y2.get('array').insert(0, [Y.Array])
+        yield flushAll()
+        expect(event.values[0]).toEqual(event.object.get(0))
+        expect(event.values[0] != null).toBeTruthy()
+        expect(event.values[0]).toEqual(l1.toArray()[0])
         done()
       }))
     })
