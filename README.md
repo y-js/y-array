@@ -30,8 +30,7 @@ npm install y-array --save
 * .delete(position, length)
   * Delete content. The *length* parameter is optional and defaults to 1
 * .toArray()
-  * Retrieve primitive content as an Array Object
-  * This means that this will not return type definitions (for efficiency reasons) - you have to retrieve them with `.get(position)`
+  * Retrieve the complete content as an array
 * .get(position)
   * Retrieve content from a position
 * .observe(function observer(event){..})

@@ -122,10 +122,13 @@ function extend (Y) {
         return this.os.getType(this._content[pos].type)
       }
     }
-    // only returns primitive values
     toArray () {
-      return this._content.map(function (x, i) {
-        return x.val
+      return this._content.map((x, i) => {
+        if (x.type != null) {
+          return this.os.getType(x.type)
+        } else {
+          return x.val
+        }
       })
     }
     push (contents) {
