@@ -27,6 +27,13 @@ function extend (Y) {
               throw new Error('Unexpected operation!')
             }
           }
+          var _e = this._content[pos]
+          // when using indexeddb db adapter, the op could already exist (see y-js/y-indexeddb#2)
+          // If the algorithm works correctly, the double should always exist on the correct position (pos - the computed destination)
+          if (_e != null && Y.utils.compareIds(_e.id, op.id)) {
+            // is already defined
+            return
+          }
           var values
           var length
           if (op.hasOwnProperty('opContent')) {
