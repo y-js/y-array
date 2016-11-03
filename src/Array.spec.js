@@ -51,20 +51,20 @@ for (let database of databases) {
 
     describe('Basic tests', function () {
       it('insert three elements, try re-get property', async(function * (done) {
-        var array = yield y1.set('Array', Y.Array)
+        var array = y1.set('Array', Y.Array)
         array.insert(0, [1, 2, 3])
-        array = yield y1.get('Array') // re-get property
+        array = y1.get('Array') // re-get property
         expect(array.toArray()).toEqual([1, 2, 3])
         done()
       }))
       it('Basic insert in array (handle three conflicts)', async(function * (done) {
-        yield y1.set('Array', Y.Array)
+        y1.set('Array', Y.Array)
         yield flushAll()
-        var l1 = yield y1.get('Array')
+        var l1 = y1.get('Array')
         l1.insert(0, [0])
-        var l2 = yield y2.get('Array')
+        var l2 = y2.get('Array')
         l2.insert(0, [1])
-        var l3 = yield y3.get('Array')
+        var l3 = y3.get('Array')
         l3.insert(0, [2])
         yield flushAll()
         expect(l1.toArray()).toEqual(l2.toArray())
@@ -77,10 +77,10 @@ for (let database of databases) {
         l1.insert(0, ['x', 'y', 'z'])
         yield flushAll()
         l1.insert(1, [0])
-        l2 = yield y2.get('Array')
+        l2 = y2.get('Array')
         l2.delete(0)
         l2.delete(1)
-        l3 = yield y3.get('Array')
+        l3 = y3.get('Array')
         l3.insert(1, [2])
         yield flushAll()
         expect(l1.toArray()).toEqual(l2.toArray())
@@ -90,13 +90,13 @@ for (let database of databases) {
       }))
       it('Handles getOperations ascending ids bug in late sync', async(function * (done) {
         var l1, l2
-        l1 = yield y1.set('Array', Y.Array)
+        l1 = y1.set('Array', Y.Array)
         l1.insert(0, ['x', 'y'])
         yield flushAll()
         yconfig3.disconnect()
         yconfig2.disconnect()
         yield wait()
-        l2 = yield y2.get('Array')
+        l2 = y2.get('Array')
         l2.insert(1, [2])
         l2.insert(1, [3])
         yield yconfig2.reconnect()
@@ -106,12 +106,12 @@ for (let database of databases) {
       }))
       it('Handles deletions in late sync', async(function * (done) {
         var l1, l2
-        l1 = yield y1.set('Array', Y.Array)
+        l1 = y1.set('Array', Y.Array)
         l1.insert(0, ['x', 'y'])
         yield flushAll()
         yield yconfig2.disconnect()
         yield wait()
-        l2 = yield y2.get('Array')
+        l2 = y2.get('Array')
         l2.delete(1, 1)
         l1.delete(0, 2)
         yield yconfig2.reconnect()
@@ -120,9 +120,9 @@ for (let database of databases) {
       }))
       it('Handles deletions in late sync (2)', async(function * (done) {
         var l1, l2
-        l1 = yield y1.set('Array', Y.Array)
+        l1 = y1.set('Array', Y.Array)
         yield flushAll()
-        l2 = yield y2.get('Array')
+        l2 = y2.get('Array')
         l1.insert(0, ['x', 'y'])
         yield wait()
         yield flushAll()
@@ -134,9 +134,9 @@ for (let database of databases) {
       }))
       it('Handles deletions in late sync (3)', async(function * (done) {
         var l1, l2
-        l1 = yield y1.set('Array', Y.Array)
+        l1 = y1.set('Array', Y.Array)
         yield flushAll()
-        l2 = yield y2.get('Array')
+        l2 = y2.get('Array')
         l1.insert(0, ['x', 'y'])
         l1.delete(0, 2)
         yield flushAll()
@@ -145,12 +145,12 @@ for (let database of databases) {
       }))
       it('Basic insert. Then delete the whole array', async(function * (done) {
         var l1, l2, l3
-        l1 = yield y1.set('Array', Y.Array)
+        l1 = y1.set('Array', Y.Array)
         l1.insert(0, ['x', 'y', 'z'])
         yield flushAll()
         l1.delete(0, 3)
-        l2 = yield y2.get('Array')
-        l3 = yield y3.get('Array')
+        l2 = y2.get('Array')
+        l3 = y3.get('Array')
         yield flushAll()
         expect(l1.toArray()).toEqual(l2.toArray())
         expect(l2.toArray()).toEqual(l3.toArray())
@@ -159,17 +159,20 @@ for (let database of databases) {
       }))
       it('Basic insert. Then delete the whole array (merge listeners on late sync)', async(function * (done) {
         var l1, l2, l3
-        l1 = yield y1.set('Array', Y.Array)
+        l1 = y1.set('Array', Y.Array)
         l1.insert(0, ['x', 'y', 'z'])
         yield flushAll()
         yield yconfig2.disconnect()
         l1.delete(0, 3)
-        l2 = yield y2.get('Array')
+        l2 = y2.get('Array')
         yield wait()
         yield yconfig2.reconnect()
         yield wait()
-        l3 = yield y3.get('Array')
+        l3 = y3.get('Array')
         yield flushAll()
+        yield wait(1000)
+        yield flushAll()
+        yield wait(3000)
         expect(l1.toArray()).toEqual(l2.toArray())
         expect(l2.toArray()).toEqual(l3.toArray())
         expect(l2.toArray()).toEqual([])
@@ -177,14 +180,14 @@ for (let database of databases) {
       }))
       it('Basic insert. Then delete the whole array (merge deleter on late sync)', async(function * (done) {
         var l1, l2, l3
-        l1 = yield y1.set('Array', Y.Array)
+        l1 = y1.set('Array', Y.Array)
         l1.insert(0, ['x', 'y', 'z'])
         yield flushAll()
         yconfig1.disconnect()
         l1.delete(0, 3)
-        l2 = yield y2.get('Array')
+        l2 = y2.get('Array')
         yield yconfig1.reconnect()
-        l3 = yield y3.get('Array')
+        l3 = y3.get('Array')
         yield flushAll()
         expect(l1.toArray()).toEqual(l2.toArray())
         expect(l2.toArray()).toEqual(l3.toArray())
@@ -222,7 +225,7 @@ for (let database of databases) {
         done()
       }))
       it('throw insert & delete events for types', async(function * (done) {
-        var array = yield this.users[0].share.root.set('array', Y.Array)
+        var array = this.users[0].share.root.set('array', Y.Array)
         var event
         array.observe(function (e) {
           event = e
@@ -234,7 +237,7 @@ for (let database of databases) {
           index: 0,
           length: 1
         })
-        var type = yield array.get(0)
+        var type = array.get(0)
         expect(type._model).toBeTruthy()
         array.delete(0)
         compareEvent(event, {
@@ -249,7 +252,7 @@ for (let database of databases) {
         done()
       }))
       it('throw insert & delete events for types (2)', async(function * (done) {
-        var array = yield this.users[0].share.root.set('array', Y.Array)
+        var array = this.users[0].share.root.set('array', Y.Array)
         var events = []
         array.observe(function (e) {
           events.push(e)
@@ -280,16 +283,16 @@ for (let database of databases) {
       }))
       it('garbage collects', async(function * (done) {
         var l1, l2, l3
-        l1 = yield y1.set('Array', Y.Array)
+        l1 = y1.set('Array', Y.Array)
         l1.insert(0, ['x', 'y', 'z'])
         yield flushAll()
         yconfig1.disconnect()
         l1.delete(0, 3)
-        l2 = yield y2.get('Array')
+        l2 = y2.get('Array')
         yield wait()
         yield yconfig1.reconnect()
         yield wait()
-        l3 = yield y3.get('Array')
+        l3 = y3.get('Array')
         yield flushAll()
         yield garbageCollectAllUsers(this.users)
         expect(l1.toArray()).toEqual(l2.toArray())
@@ -562,7 +565,7 @@ for (let database of databases) {
         l1.observe(function (e) {
           event = e
         })
-        yield l1.insert(0, ['stuff'])
+        l1.insert(0, ['stuff'])
         expect(event.values[0]).toEqual(event.object.get(0))
         expect(event.values[0]).toEqual('stuff')
         expect(event.values[0]).toEqual(l1.toArray()[0])
@@ -575,7 +578,7 @@ for (let database of databases) {
         l1.observe(function (e) {
           event = e
         })
-        yield y2.get('array').insert(0, ['stuff'])
+        y2.get('array').insert(0, ['stuff'])
         yield flushAll()
         expect(event.values[0]).toEqual(event.object.get(0))
         expect(event.values[0]).toEqual('stuff')
@@ -589,7 +592,7 @@ for (let database of databases) {
         l1.observe(function (e) {
           event = e
         })
-        yield l1.insert(0, [Y.Array])
+        l1.insert(0, [Y.Array])
         expect(event.values[0]).toEqual(event.object.get(0))
         expect(event.values[0] != null).toBeTruthy()
         expect(event.values[0]).toEqual(l1.toArray()[0])
@@ -602,7 +605,7 @@ for (let database of databases) {
         l1.observe(function (e) {
           event = e
         })
-        yield y2.get('array').insert(0, [Y.Array])
+        y2.get('array').insert(0, [Y.Array])
         yield flushAll()
         expect(event.values[0]).toEqual(event.object.get(0))
         expect(event.values[0] != null).toBeTruthy()
@@ -662,14 +665,14 @@ for (let database of databases) {
         }
       ]
       beforeEach(async(function * (done) {
-        yield this.users[0].share.root.set('Array', Y.Array)
+        this.users[0].share.root.set('Array', Y.Array)
         yield flushAll()
 
-        var promises = []
+        var arrays = []
         for (var u = 0; u < this.users.length; u++) {
-          promises.push(this.users[u].share.root.get('Array'))
+          arrays.push(this.users[u].share.root.get('Array'))
         }
-        this.arrays = yield Promise.all(promises)
+        this.arrays = arrays
         done()
       }))
       it('arrays.length equals users.length', async(function * (done) {
