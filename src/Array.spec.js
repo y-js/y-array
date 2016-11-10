@@ -28,7 +28,7 @@ function compareArrayValues (arrays) {
   }
 }
 
-var numberOfYArrayTests = 70
+var numberOfYArrayTests = 900
 var repeatArrayTests = 3
 
 for (let database of databases) {
