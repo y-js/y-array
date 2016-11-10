@@ -14,6 +14,11 @@ function extend (Y) {
       this.eventHandler = new Y.utils.EventHandler((op) => {
         // this._debugEvents.push(JSON.parse(JSON.stringify(op)))
         if (op.struct === 'Insert') {
+          // when using indexeddb db adapter, the op could already exist (see y-js/y-indexeddb#2)
+          if (this._content.some(function (c) { return Y.utils.compareIds(c.id, op.id) })) {
+            // op exists
+            return
+          }
           let pos
           // we check op.left only!,
           // because op.right might not be defined when this is called
@@ -27,13 +32,14 @@ function extend (Y) {
               throw new Error('Unexpected operation!')
             }
           }
+          /* (see above for new approach)
           var _e = this._content[pos]
           // when using indexeddb db adapter, the op could already exist (see y-js/y-indexeddb#2)
           // If the algorithm works correctly, the double should always exist on the correct position (pos - the computed destination)
           if (_e != null && Y.utils.compareIds(_e.id, op.id)) {
             // is already defined
             return
-          }
+          }*/
           var values
           var length
           if (op.hasOwnProperty('opContent')) {
