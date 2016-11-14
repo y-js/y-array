@@ -8,7 +8,7 @@ require('../yjs/gulpfile.helper.js')(gulp, {
   polyfills: [],
   entry: './src/Array.js',
   targetName: 'y-array.js',
-  moduleName: 'y-array',
+  moduleName: 'yArray',
   specs: ['./src/Array.spec.js']
 })
 
