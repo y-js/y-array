@@ -61,7 +61,7 @@ function extend (Y) {
             if (contents.length < 30000) {
               this._content.splice.apply(this._content, [pos, 0].concat(contents))
             } else {
-              this._content = this._content.slice(0,pos).concat(contents).concat(this._content.slice(pos))
+              this._content = this._content.slice(0, pos).concat(contents).concat(this._content.slice(pos))
             }
             values = op.content
             length = op.content.length
