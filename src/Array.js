@@ -9,6 +9,7 @@ function extend (Y) {
       this._model = _model
       // Array of all the neccessary content
       this._content = _content
+
       // this._debugEvents = [] // TODO: remove!!
       this.eventHandler = new Y.utils.EventHandler((op) => {
         // this._debugEvents.push(JSON.parse(JSON.stringify(op)))
@@ -56,7 +57,12 @@ function extend (Y) {
               }
             })
             // insert value in _content
-            this._content.splice.apply(this._content, [pos, 0].concat(contents))
+            // It is not possible to insert more than ~2^16 elements in an Array (see #5). We handle this case explicitly
+            if (contents.length < 30000) {
+              this._content.splice.apply(this._content, [pos, 0].concat(contents))
+            } else {
+              this._content = this._content.slice(0,pos).concat(contents).concat(this._content.slice(pos))
+            }
             values = op.content
             length = op.content.length
           }
