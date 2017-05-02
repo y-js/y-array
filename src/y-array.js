@@ -333,7 +333,7 @@ function extend (Y) {
   }))
 }
 
-module.exports = extend
+export default extend
 if (typeof Y !== 'undefined') {
   extend(Y)
 }
