@@ -32,14 +32,17 @@ function extend (Y) {
               throw new Error('Unexpected operation!')
             }
           }
-          /* (see above for new approach)
+
+          /*
+          (see above for new approach)
           var _e = this._content[pos]
           // when using indexeddb db adapter, the op could already exist (see y-js/y-indexeddb#2)
           // If the algorithm works correctly, the double should always exist on the correct position (pos - the computed destination)
           if (_e != null && Y.utils.compareIds(_e.id, op.id)) {
             // is already defined
             return
-          }*/
+          }
+          */
           var values
           var length
           if (op.hasOwnProperty('opContent')) {
@@ -213,16 +216,16 @@ function extend (Y) {
         // now we can set the right reference.
         var mostRight
         if (mostLeft != null) {
-          var ml = yield* this.getInsertionCleanEnd(mostLeft)
+          var ml = yield * this.getInsertionCleanEnd(mostLeft)
           mostRight = ml.right
         } else {
-          mostRight = (yield* this.getOperation(ops[0].parent)).start
+          mostRight = (yield * this.getOperation(ops[0].parent)).start
         }
         for (var j = 0; j < ops.length; j++) {
           var op = ops[j]
           op.right = mostRight
         }
-        yield* eventHandler.awaitOps(this, this.applyCreatedOperations, [ops])
+        yield * eventHandler.awaitOps(this, this.applyCreatedOperations, [ops])
       })
       // always remember to do that after this.os.requestTransaction
       // (otherwise values might contain a undefined reference to type)
@@ -260,7 +263,7 @@ function extend (Y) {
         })
       }
       this.os.requestTransaction(function *() {
-        yield* eventHandler.awaitOps(this, this.applyCreatedOperations, [dels])
+        yield * eventHandler.awaitOps(this, this.applyCreatedOperations, [dels])
       })
       // always remember to do that after this.os.requestTransaction
       // (otherwise values might contain a undefined reference to type)
@@ -279,7 +282,7 @@ function extend (Y) {
           var l = op.left
           var left
           while (l != null) {
-            left = yield* transaction.getInsertion(l)
+            left = yield * transaction.getInsertion(l)
             if (!left.deleted) {
               break
             }
@@ -288,7 +291,7 @@ function extend (Y) {
           op.left = l
           // if op contains opContent, initialize it
           if (op.opContent != null) {
-            yield* transaction.store.initType.call(transaction, op.opContent)
+            yield * transaction.store.initType.call(transaction, op.opContent)
           }
         }
         this.eventHandler.receivedOp(op)
@@ -303,7 +306,7 @@ function extend (Y) {
     initType: function * YArrayInitializer (os, model) {
       var _content = []
       var _types = []
-      yield* Y.Struct.List.map.call(this, model, function (op) {
+      yield * Y.Struct.List.map.call(this, model, function (op) {
         if (op.hasOwnProperty('opContent')) {
           _content.push({
             id: op.id,
@@ -320,7 +323,7 @@ function extend (Y) {
         }
       })
       for (var i = 0; i < _types.length; i++) {
-        yield* this.store.initType.call(this, _types[i])
+        yield * this.store.initType.call(this, _types[i])
       }
       return new YArray(os, model.id, _content)
     },
