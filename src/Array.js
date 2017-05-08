@@ -10,6 +10,12 @@ function extend (Y) {
       // Array of all the neccessary content
       this._content = _content
 
+      // the parent of this type
+      this._parent = null
+      // how the parent accesses this type. E.g. parent.get(parentSub) = this
+      this._parentSub
+      this._deepEventHandler = new Y.utils.EventListenerHandler()
+
       // this._debugEvents = [] // TODO: remove!!
       this.eventHandler = new Y.utils.EventHandler((op) => {
         // this._debugEvents.push(JSON.parse(JSON.stringify(op)))
@@ -48,7 +54,10 @@ function extend (Y) {
               type: op.opContent
             })
             length = 1
-            values = [this.os.getType(op.opContent)]
+            let type = this.os.getType(op.opContent)
+            type._parent = this._model
+            type._parentSub = pos
+            values = [type]
           } else {
             var contents = op.content.map(function (c, i) {
               return {
@@ -66,7 +75,7 @@ function extend (Y) {
             values = op.content
             length = op.content.length
           }
-          this.eventHandler.callEventListeners({
+          Y.utils.bubbleEvent(this, {
             type: 'insert',
             object: this,
             index: pos,
@@ -98,7 +107,7 @@ function extend (Y) {
                   return this.os.getType(c.type)
                 }
               })
-              this.eventHandler.callEventListeners({
+              Y.utils.bubbleEvent(this, {
                 type: 'delete',
                 object: this,
                 index: i,
@@ -122,6 +131,8 @@ function extend (Y) {
       this.eventHandler = null
       this._content = null
       this._model = null
+      this._parent = null
+      this._parentSub = null
       this.os = null
     }
     get length () {

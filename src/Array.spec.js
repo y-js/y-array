@@ -28,8 +28,8 @@ function compareArrayValues (arrays) {
   }
 }
 
-var numberOfYArrayTests = 300
-var repeatArrayTests = 3
+var numberOfYArrayTests = 90
+var repeatArrayTests = 1
 
 for (let database of databases) {
   if (database !== 'memory') continue // TODO: REMOVE
@@ -275,6 +275,21 @@ for (let database of databases) {
           length: 1
         })
         yield wait(50)
+        done()
+      }))
+      it('observes using observePath', async(function * (done) {
+        var pathes = []
+        var calls = 0
+        y1.observeDeep(function (event) {
+          pathes.push(event.path)
+          calls++
+        })
+        y1.set('array', Y.Array)
+        y1.get('array').insert(0, [Y.Map])
+        y1.get('array').get(0).set('map', Y.Array)
+        y1.get('array').get(0).get('map').insert(0, ['content'])
+        expect(calls === 4).toBeTruthy()
+        expect(pathes).toEqual([[], ['array'], ['array', 0], ['array', 0, 'map']])
         done()
       }))
       it('garbage collects', async(function * (done) {
