@@ -1,7 +1,7 @@
 # Array Type for [Yjs](https://github.com/y-js/yjs)
 
 This plugins provides a shareable Array type. You can insert and delete objects in y-array. The objects must either be a custom type,
-or fulfill the following property: `v equals JSON.parse(JSON.stringify(v))` (according to your definition of equality) 
+or fulfill the following property: `v equals JSON.parse(JSON.stringify(v))` (according to your definition of equality)
 
 ## Use it!
 Install this with bower or npm.
@@ -38,6 +38,9 @@ npm install y-array --save
   * Throws insert, and delete events (`event.type`)
   * Insert event example: `{type: 'insert', index: 0, values: [0, 1, 2], length: 3}`
   * Delete event example: `{type: 'delete', index: 0, oldValues: [0, 1, 2], length: 3}`
+* .observeDeep(function observer(event){..})
+  * Same as .observe, but catches events from all children (if they support .observeDeep)
+  * `event.path` specifies the path of the change event
 * .unobserve(f)
   * Delete an observer
 
