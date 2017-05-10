@@ -56,39 +56,7 @@ var repeatArrayTests = 3
 
       /*
       describe('Basic tests', function () {
-        it('Basic insert&delete in array (handle three conflicts)', async(function * (done) {
-          var l1, l2, l3
-          l1 = yield y1.set('Array', Y.Array)
-          l1.insert(0, ['x', 'y', 'z'])
-          yield flushAll()
-          l1.insert(1, [0])
-          l2 = y2.get('Array')
-          l2.delete(0)
-          l2.delete(1)
-          l3 = y3.get('Array')
-          l3.insert(1, [2])
-          yield flushAll()
-          expect(l1.toArray()).toEqual(l2.toArray())
-          expect(l2.toArray()).toEqual(l3.toArray())
-          expect(l2.toArray()).toEqual([0, 2, 'y'])
-          done()
-        }))
-        it('Handles getOperations ascending ids bug in late sync', async(function * (done) {
-          var l1, l2
-          l1 = y1.set('Array', Y.Array)
-          l1.insert(0, ['x', 'y'])
-          yield flushAll()
-          yconfig3.disconnect()
-          yconfig2.disconnect()
-          yield wait()
-          l2 = y2.get('Array')
-          l2.insert(1, [2])
-          l2.insert(1, [3])
-          yield yconfig2.reconnect()
-          yield yconfig3.reconnect()
-          expect(l1.toArray()).toEqual(l2.toArray())
-          done()
-        }))
+        
         it('Handles deletions in late sync', async(function * (done) {
           var l1, l2
           l1 = y1.set('Array', Y.Array)

@@ -5,7 +5,7 @@
   "main": "./src/Array.js",
   "scripts": {
     "test": "rollup -c rollup.test.js && node test.js",
-    "debug:browser": "concurrently 'rollup -wc rollup.test.js' 'budo --watch --open test.js'",
+    "debug": "concurrently 'rollup -wc rollup.test.js' '../../t--/bin/serve.js test.js -o'",
     "lint": "standard"
   },
   "pre-commit": [
@@ -40,12 +40,14 @@
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-latest": "^6.24.1",
+    "budo": "^10.0.3",
     "concurrently": "^3.4.0",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-uglify": "^1.0.2",
-    "rollup-watch": "^3.2.2"
+    "rollup-watch": "^3.2.2",
+    "standard": "^10.0.2"
   },
   "peerDependencies": {
     "yjs": "^12.0.0"

@@ -14,8 +14,5 @@ export default {
     commonjs()
   ],
   dest: 'test.js',
-  sourceMap: true,
-  external: [],
-  globals: {
-  }
+  sourceMap: true
 }

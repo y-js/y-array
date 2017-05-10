@@ -16,7 +16,9 @@ export async function compareUsers (t, users) {
     var data = {}
     u.db.requestTransaction(function * () {
       data.os = yield * this.getOperationsUntransformed()
-      data.os = data.os.untransformed
+      data.os = data.os.untransformed.map((op) => {
+        return Y.Struct[op.struct].encode(op)
+      })
       data.ds = yield * this.getDeleteSet()
       data.ss = yield * this.getStateSet()
     })
@@ -25,6 +27,7 @@ export async function compareUsers (t, users) {
   }))
   for (var i = 0; i < data.length - 1; i++) {
     await t.asyncGroup(async () => {
+      t.compare(users[i].share.array.toArray(), users[i + 1].share.array.toArray(), 'types')
       t.compare(data[i].os, data[i + 1].os, 'os')
       t.compare(data[i].ds, data[i + 1].ds, 'ds')
       t.compare(data[i].ss, data[i + 1].ss, 'ss')
@@ -56,6 +59,12 @@ export async function initArrays (t, opts) {
 }
 
 export async function flushAll (t, users) {
+  await Promise.all(users.map(u => {
+    return new Promise(function (resolve) {
+      u.connector.whenSynced(resolve)
+    })
+  }))
+  await wait()
   await Promise.all(users.map(u => { return u.db.whenTransactionsFinished() }))
   var flushCounter = users[0].share._flushHelper.get('0')
   await Promise.all(users.map(async (u, i) => {
@@ -72,4 +81,10 @@ export async function flushAll (t, users) {
       u.share._flushHelper.observe(observer)
     })
   }))
+}
+
+export function wait (t) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, t || 1000)
+  })
 }

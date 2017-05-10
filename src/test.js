@@ -1,5 +1,7 @@
-import { initArrays, flushAll, compareUsers } from './test-helper.js'
-import test from '../../../t--/src/t--.js'
+import { wait, initArrays, flushAll, compareUsers } from './testHelper.js'
+import test, { proxyConsole } from '../../../t--/src/t--.js'
+
+proxyConsole()
 
 var database = { name: 'memory' }
 var connector = { name: 'websockets-client' }
@@ -13,14 +15,38 @@ test(`insert three elements, try re-get property`, async function basic1 (t) {
   await compareUsers(t, users)
 })
 
-test('handle three conflicts', async function basic23 (t) {
+test('concurrent insert (handle three conflicts)', async function basic2 (t) {
   var { users, array0, array1, array2 } = await initArrays(t, { users: 3, connector: connector, db: database })
   array0.insert(0, [0])
   array1.insert(0, [1])
   array2.insert(0, [2])
 
+  await compareUsers(t, users)
+})
+
+test('concurrent insert&delete (handle three conflicts)', async function basic3 (t) {
+  var { users, array0, array1, array2 } = await initArrays(t, { users: 3, connector: connector, db: database })
+  array0.insert(0, ['x', 'y', 'z'])
   await flushAll(t, users)
-  t.compare(array0.toArray(), array1.toArray(), 'Compare array0 with array1')
-  t.compare(array1.toArray(), array2.toArray(), 'Compare array1 with array2')
+  array0.insert(1, [0])
+  array1.delete(0)
+  array1.delete(1, 1)
+  array2.insert(1, [2])
+
+  await compareUsers(t, users)
+})
+
+test('getOperations ascending ids bug in late sync', async function basic4 (t) {
+  var { users, array0, array1, array2 } = await initArrays(t, { users: 3, connector: connector, db: database })
+  array0.insert(0, ['x', 'y'])
+  await flushAll(t, users)
+  users[1].disconnect()
+  users[2].disconnect()
+  await wait()
+  array0.insert(1, ['user0'])
+  array1.insert(1, ['user1'])
+  array2.insert(1, ['user2'])
+  await users[1].reconnect()
+  await users[2].reconnect()
   await compareUsers(t, users)
 })
