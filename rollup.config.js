@@ -10,13 +10,13 @@ export default {
     babel(),
     uglify({
       output: {
-        comments: function(node, comment) {
-            var text = comment.value;
-            var type = comment.type;
-            if (type == "comment2") {
-                // multiline comment
-                return /@license/i.test(text);
-            }
+        comments: function (node, comment) {
+          var text = comment.value
+          var type = comment.type
+          if (type === 'comment2') {
+            // multiline comment
+            return /@license/i.test(text)
+          }
         }
       }
     })
@@ -30,4 +30,4 @@ export default {
  * @license ${pkg.license}
  */
 `
-};
+}
