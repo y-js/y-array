@@ -1,4 +1,4 @@
-import { wait, initArrays, flushAll, compareUsers, Y, garbageCollectAllUsers } from './testHelper.js'
+import { wait, initArrays, flushAll, compareUsers, Y, garbageCollectAllUsers } from './helper.js'
 import test, { proxyConsole } from '../../../cutest/src/cutest.js'
 
 proxyConsole()
@@ -194,4 +194,57 @@ test('garbage collector', async function gc1 (t) {
   await flushAll(t, users)
   await garbageCollectAllUsers(t, users)
   await compareUsers(t, users)
+})
+
+test('event has correct value when setting a primitive on a YArray (same user)', async function basic11 (t) {
+  var { array0 } = await initArrays(t, { users: 3, connector: connector, db: database })
+
+  var event
+  array0.observe(function (e) {
+    event = e
+  })
+  array0.insert(0, ['stuff'])
+  t.assert(event.values[0] === event.object.get(0), 'compare value with get method')
+  t.assert(event.values[0] === 'stuff', 'check that value is actually present')
+  t.assert(event.values[0] === array0.toArray()[0], '.toArray works as expected')
+})
+
+test('event has correct value when setting a primitive on a YArray (received from another user)', async function basic12 (t) {
+  var { users, array0, array1 } = await initArrays(t, { users: 3, connector: connector, db: database })
+
+  var event
+  array0.observe(function (e) {
+    event = e
+  })
+  array1.insert(0, ['stuff'])
+  await flushAll(t, users)
+  t.assert(event.values[0] === event.object.get(0), 'compare value with get method')
+  t.assert(event.values[0] === 'stuff', 'check that value is actually present')
+  t.assert(event.values[0] === array0.toArray()[0], '.toArray works as expected')
+})
+
+test('event has correct value when setting a type on a YArray (same user)', async function basic13 (t) {
+  var { array0 } = await initArrays(t, { users: 3, connector: connector, db: database })
+
+  var event
+  array0.observe(function (e) {
+    event = e
+  })
+  array0.insert(0, [Y.Array])
+  t.assert(event.values[0] === event.object.get(0), 'compare value with get method')
+  t.assert(event.values[0] != null, 'event.value exists')
+  t.assert(event.values[0] === array0.toArray()[0], '.toArray works as expected')
+})
+test('event has correct value when setting a type on a YArray (ops received from another user)', async function basic14 (t) {
+  var { users, array0, array1 } = await initArrays(t, { users: 3, connector: connector, db: database })
+
+  var event
+  array0.observe(function (e) {
+    event = e
+  })
+  array1.insert(0, [Y.Array])
+  await flushAll(t, users)
+  t.assert(event.values[0] === event.object.get(0), 'compare value with get method')
+  t.assert(event.values[0] != null, 'event.value exists')
+  t.assert(event.values[0] === array0.toArray()[0], '.toArray works as expected')
 })

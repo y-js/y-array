@@ -57,10 +57,6 @@ var repeatArrayTests = 3
       /*
       describe('Basic tests', function () {
 
-
-
-
-
         it('Debug after implementing "content is an array" (1)', async(function * (done) {
           this.users[1].db.requestTransaction(function * asItShouldBe () {
             yield * this.store.tryExecute.call(this, {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
@@ -319,112 +315,9 @@ var repeatArrayTests = 3
           yield compareAllUsers([this.users[0], this.users[1]])
           done()
         }))
-        it('event has correct value when setting a primitive on a YArray (same user)', async(function * (done) {
-          var event
-          var l1 = y1.set('array', Y.Array)
-          yield flushAll()
-          l1.observe(function (e) {
-            event = e
-          })
-          l1.insert(0, ['stuff'])
-          expect(event.values[0]).toEqual(event.object.get(0))
-          expect(event.values[0]).toEqual('stuff')
-          expect(event.values[0]).toEqual(l1.toArray()[0])
-          done()
-        }))
-        it('event has correct value when setting a primitive on a YArray (received from another user)', async(function * (done) {
-          var event
-          var l1 = y1.set('array', Y.Array)
-          yield flushAll()
-          l1.observe(function (e) {
-            event = e
-          })
-          y2.get('array').insert(0, ['stuff'])
-          yield flushAll()
-          expect(event.values[0]).toEqual(event.object.get(0))
-          expect(event.values[0]).toEqual('stuff')
-          expect(event.values[0]).toEqual(l1.toArray()[0])
-          done()
-        }))
-        it('event has correct value when setting a type on a YArray (same user)', async(function * (done) {
-          var event
-          var l1 = y1.set('array', Y.Array)
-          yield flushAll()
-          l1.observe(function (e) {
-            event = e
-          })
-          l1.insert(0, [Y.Array])
-          expect(event.values[0]).toEqual(event.object.get(0))
-          expect(event.values[0] != null).toBeTruthy()
-          expect(event.values[0]).toEqual(l1.toArray()[0])
-          done()
-        }))
-        it('event has correct value when setting a type on a YArray (ops received from another user)', async(function * (done) {
-          var event
-          var l1 = y1.set('array', Y.Array)
-          yield flushAll()
-          l1.observe(function (e) {
-            event = e
-          })
-          y2.get('array').insert(0, [Y.Array])
-          yield flushAll()
-          expect(event.values[0]).toEqual(event.object.get(0))
-          expect(event.values[0] != null).toBeTruthy()
-          expect(event.values[0]).toEqual(l1.toArray()[0])
-          done()
-        }))
       })
       describeManyTimes(repeatArrayTests, 'Random tests', function () {
-        var randomArrayTransactions = [
-          function insert (array) {
-            var c = getRandomNumber()
-            var content = []
-            var len = getRandomNumber(4)
-            for (var i = 0; i < len; i++) {
-              content.push(c + i)
-            }
-            array.insert(getRandomNumber(array.toArray().length + 1), content)
-          },
-          function insertTypeArray (array) {
-            var pos = getRandomNumber(array.toArray().length + 1)
-            array.insert(pos, [Y.Array])
-            var array2 = array.get(pos)
-            array2.insert(0, [1, 2, 3, 4])
-          },
-          function insertTypeMap (array) {
-            var pos = getRandomNumber(array.toArray().length + 1)
-            array.insert(pos, [Y.Map])
-            var map = array.get(pos)
-            map.set('someprop', 42)
-            map.set('someprop', 43)
-            map.set('someprop', 44)
-          },
-          function _delete (array) {
-            var length = array._content.length
-            if (length > 0) {
-              var pos = getRandomNumber(length)
-              var delLength = getRandom([getRandomNumber(length - pos) + 1, 1])
-              if (array._content[pos].type != null) {
-                if (getRandomNumber(2) === 1) {
-                  var type = array.get(pos)
-                  if (type instanceof Y.Array.typeDefinition.class) {
-                    if (type._content.length > 0) {
-                      pos = getRandomNumber(type._content.length)
-                      delLength = getRandom([getRandomNumber(type._content.length - pos) + 1, 1])
-                      type.delete(pos, delLength)
-                    }
-                  } else {
-                    type.delete('someprop')
-                  }
-                } else {
-                  array.delete(pos, delLength)
-                }
-              } else {
-                array.delete(pos, delLength)
-              }
-            }
-          }
-        ]
+        
         beforeEach(async(function * (done) {
           this.users[0].share.root.set('Array', Y.Array)
           yield flushAll()

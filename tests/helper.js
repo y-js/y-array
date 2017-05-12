@@ -12,7 +12,7 @@ Y.extend(yWebsockets, yMemory, yArray, yMap)
 
 export async function garbageCollectAllUsers (t, users) {
   await flushAll(t, users)
-  users.map(u => u.db.emptyGarbageCollector())
+  await Promise.all(users.map(u => u.db.emptyGarbageCollector()))
 }
 
 export async function compareUsers (t, users) {
