@@ -1,4 +1,4 @@
-import { wait, initArrays, flushAll, compareUsers } from './testHelper.js'
+import { wait, initArrays, flushAll, compareUsers, Y, garbageCollectAllUsers } from './testHelper.js'
 import test, { proxyConsole } from '../../../cutest/src/cutest.js'
 
 proxyConsole()
@@ -86,6 +86,112 @@ test('insert, then marge delete on sync', async function basic7 (t) {
   await users[0].disconnect()
   array1.delete(0, 3)
   await wait()
-  await users[1].reconnect()
+  await users[0].reconnect()
+  await compareUsers(t, users)
+})
+
+function compareEvent (t, is, should) {
+  for (var key in should) {
+    t.assert(
+      should[key] === is[key] ||
+      JSON.stringify(should[key]) === JSON.stringify(is[key])
+    , 'event works as expected'
+    )
+  }
+}
+
+test('insert & delete events', async function basic8 (t) {
+  var { array0 } = await initArrays(t, { users: 2, connector: connector, db: database })
+  var event
+  array0.observe(function (e) {
+    event = e
+  })
+  array0.insert(0, [0, 1, 2])
+  compareEvent(t, event, {
+    type: 'insert',
+    index: 0,
+    values: [0, 1, 2],
+    length: 3
+  })
+  array0.delete(0)
+  compareEvent(t, event, {
+    type: 'delete',
+    index: 0,
+    length: 1,
+    values: [0]
+  })
+  array0.delete(0, 2)
+  compareEvent(t, event, {
+    type: 'delete',
+    index: 0,
+    length: 2,
+    values: [1, 2]
+  })
+})
+
+test('insert & delete events for types', async function basic9 (t) {
+  var { array0 } = await initArrays(t, { users: 2, connector: connector, db: database })
+  var event
+  array0.observe(function (e) {
+    event = e
+  })
+  array0.insert(0, [Y.Array])
+  compareEvent(t, event, {
+    type: 'insert',
+    object: array0,
+    index: 0,
+    length: 1
+  })
+  var type = array0.get(0)
+  t.assert(type._model != null, 'Model of type is defined')
+  array0.delete(0)
+  compareEvent(t, event, {
+    type: 'delete',
+    object: array0,
+    index: 0,
+    length: 1
+  })
+})
+
+test('insert & delete events for types (2)', async function basic10 (t) {
+  var { array0 } = await initArrays(t, { users: 2, connector: connector, db: database })
+  var events = []
+  array0.observe(function (e) {
+    events.push(e)
+  })
+  array0.insert(0, ['hi', Y.Map])
+  compareEvent(t, events[0], {
+    type: 'insert',
+    object: array0,
+    index: 0,
+    length: 1,
+    values: ['hi']
+  })
+  compareEvent(t, events[1], {
+    type: 'insert',
+    object: array0,
+    index: 1,
+    length: 1
+  })
+  array0.delete(1)
+  compareEvent(t, events[2], {
+    type: 'delete',
+    object: array0,
+    index: 1,
+    length: 1
+  })
+})
+
+test('garbage collector', async function gc1 (t) {
+  var { users, array0 } = await initArrays(t, { users: 3, connector: connector, db: database })
+
+  array0.insert(0, ['x', 'y', 'z'])
+  await flushAll(t, users)
+  users[0].disconnect()
+  array0.delete(0, 3)
+  await wait()
+  await users[0].reconnect()
+  await flushAll(t, users)
+  await garbageCollectAllUsers(t, users)
   await compareUsers(t, users)
 })

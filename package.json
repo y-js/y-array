@@ -51,5 +51,8 @@
   },
   "peerDependencies": {
     "yjs": "^12.0.0"
+  },
+  "dependencies": {
+    "query-string": "^4.3.4"
   }
 }

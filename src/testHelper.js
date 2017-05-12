@@ -1,14 +1,19 @@
 
-import Y from '../../yjs/src/y.js'
+import _Y from '../../yjs/src/y.js'
 
 import yWebsockets from '../../y-websockets-client-es7/src/Websockets-client.js'
 import yMemory from '../../y-memory/src/Memory.js'
 import yArray from '../../y-array/src/Array.js'
 import yMap from '../../y-map/src/Map.js'
 
+export let Y = _Y
+
 Y.extend(yWebsockets, yMemory, yArray, yMap)
 
-export default Y
+export async function garbageCollectAllUsers (t, users) {
+  await flushAll(t, users)
+  users.map(u => u.db.emptyGarbageCollector())
+}
 
 export async function compareUsers (t, users) {
   await flushAll(t, users)
@@ -70,7 +75,7 @@ export async function flushAll (t, users) {
   await Promise.all(users.map(async (u, i) => {
     u.share.flushHelper.set(i + '', flushCounter)
     // wait for all users to set the flush counter to the same value
-    return await new Promise(resolve => {
+    await new Promise(resolve => {
       function observer () {
         var allUsersReceivedUpdate = true
         for (var i = 0; i < users.length; i++) {
