@@ -13,6 +13,6 @@ export default {
     }),
     commonjs()
   ],
-  dest: 'test.js',
+  dest: 'y-array.test.js',
   sourceMap: true
 }

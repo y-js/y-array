@@ -5,7 +5,7 @@
   "main": "./src/Array.js",
   "scripts": {
     "test": "rollup -c rollup.test.js && node test.js",
-    "debug": "concurrently 'rollup -wc rollup.test.js' '../../t--/bin/serve.js test.js -o'",
+    "debug": "concurrently '../y-websockets-server/src/server.js' 'rollup -wc rollup.test.js' '../../cutest/bin/serve.js y-array.test.js -o'",
     "lint": "standard"
   },
   "pre-commit": [

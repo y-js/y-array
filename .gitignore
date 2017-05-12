@@ -1,6 +1,3 @@
 /node_modules/
 .vscode
-/y-array.js
-/y-array.js.map
-/test.js
-/test.js.map
+/y-array.*

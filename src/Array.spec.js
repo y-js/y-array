@@ -56,77 +56,7 @@ var repeatArrayTests = 3
 
       /*
       describe('Basic tests', function () {
-        
-        it('Handles deletions in late sync', async(function * (done) {
-          var l1, l2
-          l1 = y1.set('Array', Y.Array)
-          l1.insert(0, ['x', 'y'])
-          yield flushAll()
-          yield yconfig2.disconnect()
-          yield wait()
-          l2 = y2.get('Array')
-          l2.delete(1, 1)
-          l1.delete(0, 2)
-          yield yconfig2.reconnect()
-          expect(l1.toArray()).toEqual(l2.toArray())
-          done()
-        }))
-        it('Handles deletions in late sync (2)', async(function * (done) {
-          var l1, l2
-          l1 = y1.set('Array', Y.Array)
-          yield flushAll()
-          l2 = y2.get('Array')
-          l1.insert(0, ['x', 'y'])
-          yield wait()
-          yield flushAll()
-          l1.delete(0, 2)
-          yield wait()
-          yield flushAll()
-          expect(l1.toArray()).toEqual(l2.toArray())
-          done()
-        }))
-        it('Handles deletions in late sync (3)', async(function * (done) {
-          var l1, l2
-          l1 = y1.set('Array', Y.Array)
-          yield flushAll()
-          l2 = y2.get('Array')
-          l1.insert(0, ['x', 'y'])
-          l1.delete(0, 2)
-          yield flushAll()
-          expect(l1.toArray()).toEqual(l2.toArray())
-          done()
-        }))
-        it('Basic insert. Then delete the whole array', async(function * (done) {
-          var l1, l2, l3
-          l1 = y1.set('Array', Y.Array)
-          l1.insert(0, ['x', 'y', 'z'])
-          yield flushAll()
-          l1.delete(0, 3)
-          l2 = y2.get('Array')
-          l3 = y3.get('Array')
-          yield flushAll()
-          expect(l1.toArray()).toEqual(l2.toArray())
-          expect(l2.toArray()).toEqual(l3.toArray())
-          expect(l2.toArray()).toEqual([])
-          done()
-        }))
-        it('Basic insert. Then delete the whole array (merge listeners on late sync)', async(function * (done) {
-          var l1, l2, l3
-          l1 = y1.set('Array', Y.Array)
-          l1.insert(0, ['x', 'y', 'z'])
-          yield flushAll()
-          yield yconfig2.disconnect()
-          l1.delete(0, 3)
-          l2 = y2.get('Array')
-          yield wait()
-          yield yconfig2.reconnect()
-          yield wait()
-          l3 = y3.get('Array')
-          expect(l1.toArray()).toEqual(l2.toArray())
-          expect(l2.toArray()).toEqual(l3.toArray())
-          expect(l2.toArray()).toEqual([])
-          done()
-        }))
+
         it('Basic insert. Then delete the whole array (merge deleter on late sync)', async(function * (done) {
           var l1, l2, l3
           l1 = y1.set('Array', Y.Array)

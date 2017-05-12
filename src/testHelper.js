@@ -39,7 +39,7 @@ export async function initArrays (t, opts) {
   var result = {
     users: []
   }
-  var share = Object.assign({ _flushHelper: 'Map', array: 'Array' }, opts.share)
+  var share = Object.assign({ flushHelper: 'Map', array: 'Array' }, opts.share)
 
   var connector = Object.assign({ room: 'debugging_' + t.name }, opts.connector)
   for (let i = 0; i < opts.users; i++) {
@@ -64,27 +64,32 @@ export async function flushAll (t, users) {
       u.connector.whenSynced(resolve)
     })
   }))
-  await wait()
   await Promise.all(users.map(u => { return u.db.whenTransactionsFinished() }))
-  var flushCounter = users[0].share._flushHelper.get('0')
+  var flushCounter = users[0].share.flushHelper.get('0') || 0
+  flushCounter++
   await Promise.all(users.map(async (u, i) => {
-    u.share._flushHelper.set(i, flushCounter)
-    // wait for changes from u to arrive at all clients
-    await new Promise(resolve => {
+    u.share.flushHelper.set(i + '', flushCounter)
+    // wait for all users to set the flush counter to the same value
+    return await new Promise(resolve => {
       function observer () {
-        if (users.some((u) => {
-          return u.share._flushHelper.get(i + '') === flushCounter
-        })) {
+        var allUsersReceivedUpdate = true
+        for (var i = 0; i < users.length; i++) {
+          if (u.share.flushHelper.get(i + '') !== flushCounter) {
+            allUsersReceivedUpdate = false
+            break
+          }
+        }
+        if (allUsersReceivedUpdate) {
           resolve()
         }
       }
-      u.share._flushHelper.observe(observer)
+      u.share.flushHelper.observe(observer)
     })
   }))
 }
 
 export function wait (t) {
   return new Promise(function (resolve) {
-    setTimeout(resolve, t || 1000)
+    setTimeout(resolve, t || 100)
   })
 }
