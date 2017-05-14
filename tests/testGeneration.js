@@ -1,5 +1,5 @@
 
-import { initArrays, compareUsers, Y } from './helper.js'
+import { wait, initArrays, compareUsers, Y, flushAll, flushSome } from './helper.js'
 import test, { proxyConsole } from '../../../cutest/src/cutest.js'
 import Chance from 'chance'
 
@@ -67,13 +67,61 @@ var arrayTransactions = [
   }
 ]
 
-test('Array test generation', async function random1 (t) {
+async function applyRandomTests (t, iterations) {
   const chance = new Chance(t.getSeed())
   var { users } = await initArrays(t, { users: 5, connector: connector, db: database })
-  for (var i = 0; i < 50; i++) {
-    var user = chance.pickone(users)
+  for (var i = 0; i < iterations; i++) {
+    if (chance.integer({min: 0, max: 39}) === 0) {
+      // 1/40 chance to disconnect/reconnect a user
+      let user = chance.pickone(users)
+      if (user.connector.isSynced) {
+        await user.disconnect()
+        await wait(100)
+      } else {
+        await user.reconnect()
+        await wait(100)
+        await new Promise(function (resolve) {
+          user.connector.whenSynced(resolve)
+        })
+      }
+    } else if (chance.integer({min: 0, max: 19}) === 0) {
+    // 1/20 chance to flush all
+      await flushAll(t, users)
+    } else if (chance.integer({min: 0, max: 6}) === 0) {
+      // 1/7 chance to flush some operations
+      await flushSome(t, users)
+    }
+    let user = chance.pickone(users)
     var test = chance.pickone(arrayTransactions)
     test(t, user, chance)
   }
   await compareUsers(t, users)
+}
+
+test('y-array: Random tests (50)', async function random50 (t) {
+  await applyRandomTests(t, 50)
+})
+
+test('y-array: Random tests (100)', async function random100 (t) {
+  await applyRandomTests(t, 100)
+})
+
+test('y-array: Random tests (200)', async function random200 (t) {
+  await applyRandomTests(t, 200)
+})
+
+test('y-array: Random tests (300)', async function random300 (t) {
+  await applyRandomTests(t, 300)
+})
+
+test('y-array: Random tests (400)', async function random400 (t) {
+  await applyRandomTests(t, 400)
+})
+
+test('y-array: Random tests (500)', async function random500 (t) {
+  await applyRandomTests(t, 500)
+})
+
+test('y-array: Random tests (1000)', async function random1000 (t) {
+  await applyRandomTests(t, 1000)
 })
