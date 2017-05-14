@@ -212,7 +212,7 @@ function extend (Y) {
         prevId = op.id
       }
       var eventHandler = this.eventHandler
-      this.os.requestTransaction(function *() {
+      this.os.requestTransaction(function * () {
         // now we can set the right reference.
         var mostRight
         if (mostLeft != null) {
@@ -247,9 +247,9 @@ function extend (Y) {
       }
       var eventHandler = this.eventHandler
       var dels = []
+      var delLength
       for (var i = 0; i < length; i = i + delLength) {
         var targetId = this._content[pos + i].id
-        var delLength
         // how many insertions can we delete in one deletion?
         for (delLength = 1; i + delLength < length; delLength++) {
           if (!Y.utils.compareIds(this._content[pos + i + delLength].id, [targetId[0], targetId[1] + delLength])) {
@@ -262,7 +262,7 @@ function extend (Y) {
           length: delLength
         })
       }
-      this.os.requestTransaction(function *() {
+      this.os.requestTransaction(function * () {
         yield * eventHandler.awaitOps(this, this.applyCreatedOperations, [dels])
       })
       // always remember to do that after this.os.requestTransaction

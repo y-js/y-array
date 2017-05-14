@@ -2,16 +2,13 @@
   "name": "y-array",
   "version": "10.0.7",
   "description": "Array Type for Yjs",
-  "main": "./src/Array.js",
+  "main": "./y-array.js",
   "scripts": {
+    "dist": "rollup -c rollup.dist.js",
     "test": "rollup -c rollup.test.js && node test.js",
     "debug": "concurrently '../y-websockets-server/src/server.js' 'rollup -wc rollup.test.js' '../../cutest/bin/serve.js y-array.test.js -o'",
     "lint": "standard"
   },
-  "pre-commit": [
-    "lint",
-    "test"
-  ],
   "standard": {
     "ignore": [
       "build/**",
@@ -40,7 +37,6 @@
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-latest": "^6.24.1",
-    "budo": "^10.0.3",
     "chance": "^1.0.8",
     "concurrently": "^3.4.0",
     "rollup-plugin-babel": "^2.7.1",
@@ -53,8 +49,5 @@
   },
   "peerDependencies": {
     "yjs": "^12.0.0"
-  },
-  "dependencies": {
-    "query-string": "^4.3.4"
   }
 }
