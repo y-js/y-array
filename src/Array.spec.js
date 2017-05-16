@@ -33,8 +33,8 @@ function compareArrayValues (arrays) {
 
 /*
 
-var numberOfYArrayTests = 300
-var repeatArrayTests = 3
+var numberOfYArrayTests = 90
+var repeatArrayTests = 1
 
 ;(async function () {
   for (let database of databases) {
@@ -44,6 +44,7 @@ var repeatArrayTests = 3
       console.log(`Array Type (DB: ${database})`)
       var y1, y2, y3, yconfig1, yconfig2, yconfig3, flushAll
 
+<<<<<<< HEAD
       async function beforeEach (t) {
         var ctx = {}
         await createUsers(ctx, 3, database)
@@ -53,6 +54,280 @@ var repeatArrayTests = 3
         flushAll = Y.utils.globalRoom.flushAll
         return ctx
       }
+=======
+    describe('Basic tests', function () {
+      it('insert three elements, try re-get property', async(function * (done) {
+        var array = y1.set('Array', Y.Array)
+        array.insert(0, [1, 2, 3])
+        array = y1.get('Array') // re-get property
+        expect(array.toArray()).toEqual([1, 2, 3])
+        done()
+      }))
+      it('Basic insert in array (handle three conflicts)', async(function * (done) {
+        y1.set('Array', Y.Array)
+        yield flushAll()
+        var l1 = y1.get('Array')
+        l1.insert(0, [0])
+        var l2 = y2.get('Array')
+        l2.insert(0, [1])
+        var l3 = y3.get('Array')
+        l3.insert(0, [2])
+        yield flushAll()
+        expect(l1.toArray()).toEqual(l2.toArray())
+        expect(l2.toArray()).toEqual(l3.toArray())
+        done()
+      }))
+      it('Basic insert&delete in array (handle three conflicts)', async(function * (done) {
+        var l1, l2, l3
+        l1 = yield y1.set('Array', Y.Array)
+        l1.insert(0, ['x', 'y', 'z'])
+        yield flushAll()
+        l1.insert(1, [0])
+        l2 = y2.get('Array')
+        l2.delete(0)
+        l2.delete(1)
+        l3 = y3.get('Array')
+        l3.insert(1, [2])
+        yield flushAll()
+        expect(l1.toArray()).toEqual(l2.toArray())
+        expect(l2.toArray()).toEqual(l3.toArray())
+        expect(l2.toArray()).toEqual([0, 2, 'y'])
+        done()
+      }))
+      it('Handles getOperations ascending ids bug in late sync', async(function * (done) {
+        var l1, l2
+        l1 = y1.set('Array', Y.Array)
+        l1.insert(0, ['x', 'y'])
+        yield flushAll()
+        yconfig3.disconnect()
+        yconfig2.disconnect()
+        yield wait()
+        l2 = y2.get('Array')
+        l2.insert(1, [2])
+        l2.insert(1, [3])
+        yield yconfig2.reconnect()
+        yield yconfig3.reconnect()
+        expect(l1.toArray()).toEqual(l2.toArray())
+        done()
+      }))
+      it('Handles deletions in late sync', async(function * (done) {
+        var l1, l2
+        l1 = y1.set('Array', Y.Array)
+        l1.insert(0, ['x', 'y'])
+        yield flushAll()
+        yield yconfig2.disconnect()
+        yield wait()
+        l2 = y2.get('Array')
+        l2.delete(1, 1)
+        l1.delete(0, 2)
+        yield yconfig2.reconnect()
+        expect(l1.toArray()).toEqual(l2.toArray())
+        done()
+      }))
+      it('Handles deletions in late sync (2)', async(function * (done) {
+        var l1, l2
+        l1 = y1.set('Array', Y.Array)
+        yield flushAll()
+        l2 = y2.get('Array')
+        l1.insert(0, ['x', 'y'])
+        yield wait()
+        yield flushAll()
+        l1.delete(0, 2)
+        yield wait()
+        yield flushAll()
+        expect(l1.toArray()).toEqual(l2.toArray())
+        done()
+      }))
+      it('Handles deletions in late sync (3)', async(function * (done) {
+        var l1, l2
+        l1 = y1.set('Array', Y.Array)
+        yield flushAll()
+        l2 = y2.get('Array')
+        l1.insert(0, ['x', 'y'])
+        l1.delete(0, 2)
+        yield flushAll()
+        expect(l1.toArray()).toEqual(l2.toArray())
+        done()
+      }))
+      it('Basic insert. Then delete the whole array', async(function * (done) {
+        var l1, l2, l3
+        l1 = y1.set('Array', Y.Array)
+        l1.insert(0, ['x', 'y', 'z'])
+        yield flushAll()
+        l1.delete(0, 3)
+        l2 = y2.get('Array')
+        l3 = y3.get('Array')
+        yield flushAll()
+        expect(l1.toArray()).toEqual(l2.toArray())
+        expect(l2.toArray()).toEqual(l3.toArray())
+        expect(l2.toArray()).toEqual([])
+        done()
+      }))
+      it('Basic insert. Then delete the whole array (merge listeners on late sync)', async(function * (done) {
+        var l1, l2, l3
+        l1 = y1.set('Array', Y.Array)
+        l1.insert(0, ['x', 'y', 'z'])
+        yield flushAll()
+        yield yconfig2.disconnect()
+        l1.delete(0, 3)
+        l2 = y2.get('Array')
+        yield wait()
+        yield yconfig2.reconnect()
+        yield wait()
+        l3 = y3.get('Array')
+        expect(l1.toArray()).toEqual(l2.toArray())
+        expect(l2.toArray()).toEqual(l3.toArray())
+        expect(l2.toArray()).toEqual([])
+        done()
+      }))
+      it('Basic insert. Then delete the whole array (merge deleter on late sync)', async(function * (done) {
+        var l1, l2, l3
+        l1 = y1.set('Array', Y.Array)
+        l1.insert(0, ['x', 'y', 'z'])
+        yield flushAll()
+        yconfig1.disconnect()
+        l1.delete(0, 3)
+        l2 = y2.get('Array')
+        yield yconfig1.reconnect()
+        l3 = y3.get('Array')
+        yield flushAll()
+        expect(l1.toArray()).toEqual(l2.toArray())
+        expect(l2.toArray()).toEqual(l3.toArray())
+        expect(l2.toArray()).toEqual([])
+        done()
+      }))
+      it('throw insert & delete events', async(function * (done) {
+        var array = yield this.users[0].share.root.set('array', Y.Array)
+        var event
+        array.observe(function (e) {
+          event = e
+        })
+        array.insert(0, [0, 1, 2])
+        compareEvent(event, {
+          type: 'insert',
+          index: 0,
+          values: [0, 1, 2],
+          length: 3
+        })
+        array.delete(0)
+        compareEvent(event, {
+          type: 'delete',
+          index: 0,
+          length: 1,
+          values: [0]
+        })
+        array.delete(0, 2)
+        compareEvent(event, {
+          type: 'delete',
+          index: 0,
+          length: 2,
+          values: [1, 2]
+        })
+        yield wait(50)
+        done()
+      }))
+      it('throw insert & delete events for types', async(function * (done) {
+        var array = this.users[0].share.root.set('array', Y.Array)
+        var event
+        array.observe(function (e) {
+          event = e
+        })
+        array.insert(0, [Y.Array])
+        compareEvent(event, {
+          type: 'insert',
+          object: array,
+          index: 0,
+          length: 1
+        })
+        var type = array.get(0)
+        expect(type._model).toBeTruthy()
+        array.delete(0)
+        compareEvent(event, {
+          type: 'delete',
+          object: array,
+          index: 0,
+          length: 1
+        })
+        yield wait(50)
+        yield garbageCollectAllUsers(this.users)
+        // expect(type._content == null).toBeTruthy() TODO: make sure everything is cleaned up!
+        done()
+      }))
+      it('throw insert & delete events for types (2)', async(function * (done) {
+        var array = this.users[0].share.root.set('array', Y.Array)
+        var events = []
+        array.observe(function (e) {
+          events.push(e)
+        })
+        array.insert(0, ['hi', Y.Map])
+        compareEvent(events[0], {
+          type: 'insert',
+          object: array,
+          index: 0,
+          length: 1,
+          values: ['hi']
+        })
+        compareEvent(events[1], {
+          type: 'insert',
+          object: array,
+          index: 1,
+          length: 1
+        })
+        array.delete(1)
+        compareEvent(events[2], {
+          type: 'delete',
+          object: array,
+          index: 1,
+          length: 1
+        })
+        yield wait(50)
+        done()
+      }))
+      it('observes using observePath', async(function * (done) {
+        var pathes = []
+        var calls = 0
+        y1.observeDeep(function (event) {
+          pathes.push(event.path)
+          calls++
+        })
+        y1.set('array', Y.Array)
+        y1.get('array').insert(0, [Y.Map])
+        y1.get('array').get(0).set('map', Y.Array)
+        y1.get('array').get(0).get('map').insert(0, ['content'])
+        expect(calls === 4).toBeTruthy()
+        expect(pathes).toEqual([[], ['array'], ['array', 0], ['array', 0, 'map']])
+        done()
+      }))
+      it('garbage collects', async(function * (done) {
+        var l1, l2, l3
+        l1 = y1.set('Array', Y.Array)
+        l1.insert(0, ['x', 'y', 'z'])
+        yield flushAll()
+        yconfig1.disconnect()
+        l1.delete(0, 3)
+        l2 = y2.get('Array')
+        yield wait()
+        yield yconfig1.reconnect()
+        yield wait()
+        l3 = y3.get('Array')
+        yield flushAll()
+        yield garbageCollectAllUsers(this.users)
+        expect(l1.toArray()).toEqual(l2.toArray())
+        expect(l2.toArray()).toEqual(l3.toArray())
+        expect(l2.toArray()).toEqual([])
+        done()
+      }))
+      it('Debug after implementing "content is an array" (1)', async(function * (done) {
+        this.users[1].db.requestTransaction(function * asItShouldBe () {
+          yield* this.store.tryExecute.call(this, {'id': ['_', 'Map_Map_root_'], 'map': {}, 'struct': 'Map', 'type': 'Map'})
+          yield* this.store.tryExecute.call(this, {'struct': 'List', 'id': ['315', 0], 'type': 'Array'})
+          yield* this.store.tryExecute.call(this, {'id': ['315', 1], 'left': null, 'right': null, 'origin': null, 'parent': ['_', 'Map_Map_root_'], 'struct': 'Insert', 'parentSub': 'Array', 'opContent': ['315', 0]})
+          yield* this.store.tryExecute.call(this, {'id': ['315', 2], 'left': null, 'right': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [8195]})
+          yield* this.store.tryExecute.call(this, {'id': ['317', 0], 'left': null, 'right': null, 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [333]})
+          yield* this.store.tryExecute.call(this, {'id': ['317', 1], 'left': null, 'right': ['317', 0], 'origin': null, 'parent': ['315', 0], 'struct': 'Insert', 'content': [6880]})
+          yield* this.store.tryExecute.call(this, {'id': ['317', 2], 'left': ['317', 1], 'right': ['317', 0], 'origin': ['317', 1], 'parent': ['315', 0], 'struct': 'Insert', 'content': [5725]})
+        })
+>>>>>>> master
 
       /*
       describe('Basic tests', function () {
