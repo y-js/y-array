@@ -6,7 +6,7 @@
   "scripts": {
     "dist": "rollup -c rollup.dist.js",
     "test": "rollup -c rollup.test.js && node test.js",
-    "debug": "concurrently '../y-websockets-server/src/server.js' 'rollup -wc rollup.test.js' '../../cutest/bin/serve.js y-array.test.js -o'",
+    "debug": "concurrently '../y-websockets-server-v13/src/server.js' 'rollup -wc rollup.test.js' '../../cutest/bin/serve.js y-array.test.js -o'",
     "lint": "standard"
   },
   "standard": {
