@@ -283,8 +283,14 @@ function extend (Y) {
     observe (f) {
       this.eventHandler.addEventListener(f)
     }
+    observeDeep (f) {
+      this._deepEventHandler.addEventListener(f)
+    }
     unobserve (f) {
       this.eventHandler.removeEventListener(f)
+    }
+    unobserveDeep (f) {
+      this._deepEventHandler.addEventListener(f)
     }
     * _changed (transaction, op) {
       if (!op.deleted) {
