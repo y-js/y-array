@@ -3,7 +3,7 @@ import _Y from '../../yjs/src/y.js'
 
 import yWebsockets from '../../y-websockets-client-v13/src/Websockets-client.js'
 import yMemory from '../../y-memory/src/Memory.js'
-import yArray from '../../y-array/src/Array.js'
+import yArray from '../src/y-array.js'
 import yMap from '../../y-map/src/Map.js'
 
 export let Y = _Y
