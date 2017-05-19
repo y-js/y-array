@@ -4,7 +4,7 @@ var pkg = require('./package.json')
 
 export default {
   entry: 'src/y-array.js',
-  moduleName: 'y-array',
+  moduleName: 'yArray',
   format: 'umd',
   plugins: [
     babel(),
