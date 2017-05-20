@@ -1,14 +1,16 @@
 
 import _Y from '../../yjs/src/y.js'
 
-import yWebsockets from '../../y-websockets-client-v13/src/Websockets-client.js'
 import yMemory from '../../y-memory/src/Memory.js'
 import yArray from '../src/y-array.js'
 import yMap from '../../y-map/src/Map.js'
+import yTest from './test-connector.js'
+
+import Chance from 'chance'
 
 export let Y = _Y
 
-Y.extend(yWebsockets, yMemory, yArray, yMap)
+Y.extend(yMemory, yArray, yMap, yTest)
 
 export async function garbageCollectAllUsers (t, users) {
   await flushAll(t, users)
@@ -17,8 +19,12 @@ export async function garbageCollectAllUsers (t, users) {
 
 export async function compareUsers (t, users) {
   var unsynced = users.filter(u => !u.connector.isSynced)
+  unsynced.forEach(u => u.reconnect())
+  if (users[0].connector.testRoom != null) {
+    // flush for sync if test-connector
+    await users[0].connector.testRoom.flushAll(users)
+  }
   await Promise.all(unsynced.map(u => {
-    u.reconnect()
     return new Promise(function (resolve) {
       u.connector.whenSynced(resolve)
     })
@@ -56,8 +62,8 @@ export async function initArrays (t, opts) {
     users: []
   }
   var share = Object.assign({ flushHelper: 'Map', array: 'Array' }, opts.share)
-
-  var connector = Object.assign({ room: 'debugging_' + t.name }, opts.connector)
+  var chance = opts.chance || new Chance(t.getSeed() * 1000000000)
+  var connector = Object.assign({ room: 'debugging_' + t.name, testContext: t, chance }, opts.connector)
   for (let i = 0; i < opts.users; i++) {
     let y = await Y({
       connector: connector,
@@ -70,6 +76,15 @@ export async function initArrays (t, opts) {
     }
   }
   result.array0.delete(0, result.array0.length)
+  if (result.users[0].connector.testRoom != null) {
+    // flush for sync if test-connector
+    await result.users[0].connector.testRoom.flushAll(result.users)
+  }
+  await Promise.all(result.users.map(u => {
+    return new Promise(function (resolve) {
+      u.connector.whenSynced(resolve)
+    })
+  }))
   await flushAll(t, result.users)
   return result
 }
@@ -79,42 +94,47 @@ export async function flushAll (t, users) {
   if (users.length === 0) {
     return
   }
-  await Promise.all(users.map(u => {
-    return new Promise(function (resolve) {
-      u.connector.whenSynced(resolve)
-    })
-  }))
-  await Promise.all(users.map(u => { return u.db.whenTransactionsFinished() }))
+  await wait(0)
+  if (users[0].connector.testRoom != null) {
+    // use flushAll method specified in Test Connector
+    await users[0].connector.testRoom.flushAll(users)
+  } else {
+    // flush for any connector
+    await Promise.all(users.map(u => { return u.db.whenTransactionsFinished() }))
 
-  var flushCounter = users[0].share.flushHelper.get('0') || 0
-  flushCounter++
-  await Promise.all(users.map(async (u, i) => {
-    // wait for all users to set the flush counter to the same value
-    await new Promise(resolve => {
-      function observer () {
-        var allUsersReceivedUpdate = true
-        for (var i = 0; i < users.length; i++) {
-          if (u.share.flushHelper.get(i + '') !== flushCounter) {
-            allUsersReceivedUpdate = false
-            break
+    var flushCounter = users[0].share.flushHelper.get('0') || 0
+    flushCounter++
+    await Promise.all(users.map(async (u, i) => {
+      // wait for all users to set the flush counter to the same value
+      await new Promise(resolve => {
+        function observer () {
+          var allUsersReceivedUpdate = true
+          for (var i = 0; i < users.length; i++) {
+            if (u.share.flushHelper.get(i + '') !== flushCounter) {
+              allUsersReceivedUpdate = false
+              break
+            }
+          }
+          if (allUsersReceivedUpdate) {
+            resolve()
           }
         }
-        if (allUsersReceivedUpdate) {
-          resolve()
-        }
-      }
-      u.share.flushHelper.observe(observer)
-      u.share.flushHelper.set(i + '', flushCounter)
-    })
-  }))
+        u.share.flushHelper.observe(observer)
+        u.share.flushHelper.set(i + '', flushCounter)
+      })
+    }))
+  }
 }
 
-export async function flushSome (t, user) {
-  await wait(100)
+export async function flushSome (t, users) {
+  if (users[0].connector.testRoom == null) {
+    // if not test-connector, wait for some time for operations to arrive
+    await wait(100)
+  }
 }
 
 export function wait (t) {
   return new Promise(function (resolve) {
-    setTimeout(resolve, t || 100)
+    setTimeout(resolve, t != null ? t : 100)
   })
 }

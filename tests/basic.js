@@ -4,7 +4,7 @@ import test, { proxyConsole } from '../../../cutest/src/cutest.js'
 proxyConsole()
 
 var database = { name: 'memory' }
-var connector = { name: 'websockets-client', url: 'http://localhost:1234' }
+var connector = { name: 'test', url: 'http://localhost:1234' }
 
 test(`insert three elements, try re-get property`, async function basic1 (t) {
   var { users, array0, array1 } = await initArrays(t, { users: 2, connector: connector, db: database })

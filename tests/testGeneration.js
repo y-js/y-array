@@ -6,7 +6,7 @@ import Chance from 'chance'
 proxyConsole()
 
 var database = { name: 'memory' }
-var connector = { name: 'websockets-client', url: 'http://localhost:1234' }
+var connector = { name: 'test', url: 'http://localhost:1234' }
 
 var _uniqueNumber = 0
 function getUniqueNumber () {
@@ -68,27 +68,35 @@ var arrayTransactions = [
 ]
 
 async function applyRandomTests (t, iterations) {
-  const chance = new Chance(t.getSeed())
-  var { users } = await initArrays(t, { users: 5, connector: connector, db: database })
+  const chance = new Chance(t.getSeed() * 1000000000)
+  var { users } = await initArrays(t, { users: 5, connector: connector, db: database, chance: chance })
   for (var i = 0; i < iterations; i++) {
-    if (chance.integer({min: 0, max: 39}) === 0) {
-      // 1/40 chance to disconnect/reconnect a user
+    if (chance.bool({likelihood: 10})) {
+      // 10% chance to disconnect/reconnect a user
       let user = chance.pickone(users)
       if (user.connector.isSynced) {
-        await user.disconnect()
-        await wait(100)
+        if (users.filter(u => u.connector.isSynced).length > 1) {
+          // make sure that at least one user remains in the room
+          await user.disconnect()
+          if (users[0].connector.testRoom == null) {
+            await wait(100)
+          }
+        }
       } else {
         await user.reconnect()
-        await wait(100)
+        if (users[0].connector.testRoom == null) {
+          await wait(100)
+        }
         await new Promise(function (resolve) {
+          window.u = user
           user.connector.whenSynced(resolve)
         })
       }
-    } else if (chance.integer({min: 0, max: 19}) === 0) {
-    // 1/20 chance to flush all
+    } else if (chance.bool({likelihood: 20})) {
+      // 20%*!prev chance to flush all
       await flushAll(t, users)
-    } else if (chance.integer({min: 0, max: 6}) === 0) {
-      // 1/7 chance to flush some operations
+    } else if (chance.bool({likelihood: 20})) {
+      // 20%*!prev chance to flush some operations
       await flushSome(t, users)
     }
     let user = chance.pickone(users)
@@ -98,12 +106,28 @@ async function applyRandomTests (t, iterations) {
   await compareUsers(t, users)
 }
 
-test('y-array: Random tests (50)', async function random50 (t) {
-  await applyRandomTests(t, 50)
+test('y-array: Random tests (42)', async function random42 (t) {
+  await applyRandomTests(t, 42)
 })
 
-test('y-array: Random tests (100)', async function random100 (t) {
-  await applyRandomTests(t, 100)
+test('y-array: Random tests (43)', async function random43 (t) {
+  await applyRandomTests(t, 43)
+})
+
+test('y-array: Random tests (44)', async function random44 (t) {
+  await applyRandomTests(t, 44)
+})
+
+test('y-array: Random tests (45)', async function random45 (t) {
+  await applyRandomTests(t, 45)
+})
+
+test('y-array: Random tests (46)', async function random46 (t) {
+  await applyRandomTests(t, 46)
+})
+
+test('y-array: Random tests (47)', async function random47 (t) {
+  await applyRandomTests(t, 47)
 })
 
 test('y-array: Random tests (200)', async function random200 (t) {
@@ -120,8 +144,4 @@ test('y-array: Random tests (400)', async function random400 (t) {
 
 test('y-array: Random tests (500)', async function random500 (t) {
   await applyRandomTests(t, 500)
-})
-
-test('y-array: Random tests (1000)', async function random1000 (t) {
-  await applyRandomTests(t, 1000)
 })
