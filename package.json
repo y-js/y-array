@@ -6,9 +6,9 @@
   "scripts": {
     "dist": "rollup -c rollup.dist.js",
     "test": "rollup -c rollup.test.js && node test.js",
-    "debug": "concurrently '../y-websockets-server-v13/src/server.js' 'rollup -wc rollup.test.js' '../../cutest/bin/serve.js y-array.test.js -o'",
+    "debug": "concurrently '../y-websockets-server/src/server.js' 'rollup -wc rollup.test.js' '../../cutest/bin/serve.js y-array.test.js -o'",
     "lint": "standard",
-    "watch": "rollup -wc rollup.dist.js -o ../yjs-v13/examples/bower_components/y-array/y-array.js"
+    "watch": "rollup -wc rollup.dist.js -o ../yjs/examples/bower_components/y-array/y-array.js"
   },
   "standard": {
     "ignore": [

@@ -1,6 +1,6 @@
 
-import { wait, initArrays, compareUsers, Y, flushAll, flushSome } from './helper.js'
-import test, { proxyConsole } from '../../../cutest/src/cutest.js'
+import { wait, initArrays, compareUsers, Y, flushAll, flushSome } from '../../yjs/tests-lib/helper.js'
+import { test, proxyConsole } from '../../../cutest/cutest.mjs'
 import Chance from 'chance'
 
 proxyConsole()
@@ -88,7 +88,6 @@ async function applyRandomTests (t, iterations) {
           await wait(100)
         }
         await new Promise(function (resolve) {
-          window.u = user
           user.connector.whenSynced(resolve)
         })
       }
