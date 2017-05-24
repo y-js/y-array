@@ -167,7 +167,7 @@ function extend (Y) {
       if (typeof pos !== 'number') {
         throw new Error('pos must be a number!')
       }
-      if (!(contents instanceof Array)) {
+      if (!Array.isArray(contents)) {
         throw new Error('contents must be an Array of objects!')
       }
       if (contents.length === 0) {
