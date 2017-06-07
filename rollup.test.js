@@ -3,7 +3,7 @@ import commonjs from 'rollup-plugin-commonjs'
 import multiEntry from 'rollup-plugin-multi-entry'
 
 export default {
-  entry: 'test/*.js',
+  entry: 'test/basic.js',
   moduleName: 'y-array-tests',
   format: 'umd',
   plugins: [

@@ -101,7 +101,7 @@ function compareEvent (t, is, should) {
 }
 
 test('insert & delete events', async function basic8 (t) {
-  var { array0 } = await initArrays(t, { users: 2, connector: connector, db: database })
+  var { array0, users } = await initArrays(t, { users: 2, connector: connector, db: database })
   var event
   array0.observe(function (e) {
     event = e
@@ -127,10 +127,11 @@ test('insert & delete events', async function basic8 (t) {
     length: 2,
     values: [1, 2]
   })
+  await compareUsers(t, users)
 })
 
 test('insert & delete events for types', async function basic9 (t) {
-  var { array0 } = await initArrays(t, { users: 2, connector: connector, db: database })
+  var { array0, users } = await initArrays(t, { users: 2, connector: connector, db: database })
   var event
   array0.observe(function (e) {
     event = e
@@ -151,10 +152,11 @@ test('insert & delete events for types', async function basic9 (t) {
     index: 0,
     length: 1
   })
+  await compareUsers(t, users)
 })
 
 test('insert & delete events for types (2)', async function basic10 (t) {
-  var { array0 } = await initArrays(t, { users: 2, connector: connector, db: database })
+  var { array0, users } = await initArrays(t, { users: 2, connector: connector, db: database })
   var events = []
   array0.observe(function (e) {
     events.push(e)
@@ -180,6 +182,7 @@ test('insert & delete events for types (2)', async function basic10 (t) {
     index: 1,
     length: 1
   })
+  await compareUsers(t, users)
 })
 
 test('garbage collector', async function gc1 (t) {
@@ -197,7 +200,7 @@ test('garbage collector', async function gc1 (t) {
 })
 
 test('event has correct value when setting a primitive on a YArray (same user)', async function basic11 (t) {
-  var { array0 } = await initArrays(t, { users: 3, connector: connector, db: database })
+  var { array0, users } = await initArrays(t, { users: 3, connector: connector, db: database })
 
   var event
   array0.observe(function (e) {
@@ -207,6 +210,7 @@ test('event has correct value when setting a primitive on a YArray (same user)',
   t.assert(event.values[0] === event.object.get(0), 'compare value with get method')
   t.assert(event.values[0] === 'stuff', 'check that value is actually present')
   t.assert(event.values[0] === array0.toArray()[0], '.toArray works as expected')
+  await compareUsers(t, users)
 })
 
 test('event has correct value when setting a primitive on a YArray (received from another user)', async function basic12 (t) {
@@ -221,10 +225,11 @@ test('event has correct value when setting a primitive on a YArray (received fro
   t.assert(event.values[0] === event.object.get(0), 'compare value with get method')
   t.assert(event.values[0] === 'stuff', 'check that value is actually present')
   t.assert(event.values[0] === array0.toArray()[0], '.toArray works as expected')
+  await compareUsers(t, users)
 })
 
 test('event has correct value when setting a type on a YArray (same user)', async function basic13 (t) {
-  var { array0 } = await initArrays(t, { users: 3, connector: connector, db: database })
+  var { array0, users } = await initArrays(t, { users: 3, connector: connector, db: database })
 
   var event
   array0.observe(function (e) {
@@ -234,6 +239,7 @@ test('event has correct value when setting a type on a YArray (same user)', asyn
   t.assert(event.values[0] === event.object.get(0), 'compare value with get method')
   t.assert(event.values[0] != null, 'event.value exists')
   t.assert(event.values[0] === array0.toArray()[0], '.toArray works as expected')
+  await compareUsers(t, users)
 })
 test('event has correct value when setting a type on a YArray (ops received from another user)', async function basic14 (t) {
   var { users, array0, array1 } = await initArrays(t, { users: 3, connector: connector, db: database })
@@ -247,4 +253,5 @@ test('event has correct value when setting a type on a YArray (ops received from
   t.assert(event.values[0] === event.object.get(0), 'compare value with get method')
   t.assert(event.values[0] != null, 'event.value exists')
   t.assert(event.values[0] === array0.toArray()[0], '.toArray works as expected')
+  await compareUsers(t, users)
 })
