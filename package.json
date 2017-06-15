@@ -6,7 +6,7 @@
   "scripts": {
     "dist": "rollup -c rollup.dist.js",
     "test": "rollup -c rollup.test.js && node test.js",
-    "debug": "concurrently 'rollup -wc rollup.test.js' '../../cutest/bin/serve.js y-array.test.js -o'",
+    "debug": "concurrently 'rollup -wc rollup.test.js' 'cutest-serve y-array.test.js -o'",
     "lint": "standard",
     "watch": "rollup -wc rollup.dist.js -o ../yjs/examples/bower_components/y-array/y-array.js"
   },
@@ -38,17 +38,16 @@
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-latest": "^6.24.1",
-    "chance": "^1.0.8",
     "concurrently": "^3.4.0",
+    "cutest": "^0.1.9",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-multi-entry": "^2.0.1",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-uglify": "^1.0.2",
     "rollup-watch": "^3.2.2",
-    "standard": "^10.0.2"
+    "standard": "^10.0.2",
+    "yjs": "file:../yjs"
   },
-  "peerDependencies": {
-    "yjs": ">= 12.3.0 < 13.0.0"
-  }
+  "dependencies": {}
 }

@@ -1,5 +1,4 @@
 /* global Y */
-'use strict'
 
 function extend (Y) {
   class YArray extends Y.utils.CustomType {

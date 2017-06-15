@@ -1,5 +1,5 @@
-import { wait, initArrays, flushAll, compareUsers, Y, garbageCollectAllUsers } from '../../yjs/tests-lib/helper.js'
-import { test, proxyConsole } from '../../../cutest/cutest.mjs'
+import { wait, initArrays, flushAll, compareUsers, Y, garbageCollectAllUsers } from 'yjs/tests-lib/helper.js'
+import { test, proxyConsole } from 'cutest'
 
 proxyConsole()
 
