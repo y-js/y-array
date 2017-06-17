@@ -12,8 +12,6 @@ function extend (Y) {
 
       // the parent of this type
       this._parent = null
-      // how the parent accesses this type. E.g. parent.get(parentSub) = this
-      this._parentSub
       this._deepEventHandler = new Y.utils.EventListenerHandler()
 
       // this._debugEvents = [] // TODO: remove!!
@@ -56,7 +54,6 @@ function extend (Y) {
             length = 1
             let type = this.os.getType(op.opContent)
             type._parent = this._model
-            type._parentSub = pos
             values = [type]
           } else {
             var contents = op.content.map(function (c, i) {
@@ -126,13 +123,17 @@ function extend (Y) {
         }
       })
     }
+    _getPathToChild (childId) {
+      return this._content.findIndex(c =>
+        c.type != null && Y.utils.compareIds(c.type, childId)
+      )
+    }
     _destroy () {
       this.eventHandler.destroy()
       this.eventHandler = null
       this._content = null
       this._model = null
       this._parent = null
-      this._parentSub = null
       this.os = null
     }
     get length () {
@@ -337,7 +338,8 @@ function extend (Y) {
         }
       })
       for (var i = 0; i < _types.length; i++) {
-        yield* this.store.initType.call(this, _types[i])
+        var type = yield* this.store.initType.call(this, _types[i])
+        type._parent = model.id
       }
       return new YArray(os, model.id, _content)
     },
