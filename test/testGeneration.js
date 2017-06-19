@@ -1,5 +1,5 @@
 
-import { wait, initArrays, compareUsers, Y, flushAll, flushSome } from 'yjs/tests-lib/helper.js'
+import { wait, initArrays, compareUsers, Y, flushSome, flushAll } from 'yjs/tests-lib/helper.js'
 import { test, proxyConsole } from 'cutest'
 import Chance from 'chance'
 
@@ -73,7 +73,8 @@ async function applyRandomTests (t, iterations) {
   for (var i = 0; i < iterations; i++) {
     if (chance.bool({likelihood: 10})) {
       // 10% chance to disconnect/reconnect a user
-      let user = chance.pickone(users)
+      // we make sure that the first users always is connected
+      let user = chance.pickone(users.slice(1))
       if (user.connector.isSynced) {
         if (users.filter(u => u.connector.isSynced).length > 1) {
           // make sure that at least one user remains in the room
@@ -91,10 +92,18 @@ async function applyRandomTests (t, iterations) {
           user.connector.whenSynced(resolve)
         })
       }
-    } else if (chance.bool({likelihood: 20})) {
-      // 20%*!prev chance to flush all
+    } else if (chance.bool({likelihood: 5})) {
+      // 20%*!prev chance to flush all & garbagecollect
+      // TODO: We do not gc all users as this does not work yet
+      // await garbageCollectUsers(t, users)
       await flushAll(t, users)
-    } else if (chance.bool({likelihood: 20})) {
+      await flushAll(t, users)
+      await wait(500)
+      await users[0].db.emptyGarbageCollector()
+      await flushAll(t, users)
+      await wait(500)
+      await flushAll(t, users)
+    } else if (chance.bool({likelihood: 10})) {
       // 20%*!prev chance to flush some operations
       await flushSome(t, users)
     }

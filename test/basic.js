@@ -1,4 +1,4 @@
-import { wait, initArrays, flushAll, compareUsers, Y, garbageCollectAllUsers } from 'yjs/tests-lib/helper.js'
+import { wait, initArrays, flushAll, compareUsers, Y, garbageCollectUsers } from 'yjs/tests-lib/helper.js'
 import { test, proxyConsole } from 'cutest'
 
 proxyConsole()
@@ -195,7 +195,7 @@ test('garbage collector', async function gc1 (t) {
   await wait()
   await users[0].reconnect()
   await flushAll(t, users)
-  await garbageCollectAllUsers(t, users)
+  await garbageCollectUsers(t, users)
   await compareUsers(t, users)
 })
 
