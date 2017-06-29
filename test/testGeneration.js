@@ -97,11 +97,7 @@ async function applyRandomTests (t, iterations) {
       // TODO: We do not gc all users as this does not work yet
       // await garbageCollectUsers(t, users)
       await flushAll(t, users)
-      await flushAll(t, users)
-      await wait(500)
       await users[0].db.emptyGarbageCollector()
-      await flushAll(t, users)
-      await wait(500)
       await flushAll(t, users)
     } else if (chance.bool({likelihood: 10})) {
       // 20%*!prev chance to flush some operations
@@ -138,6 +134,8 @@ test('y-array: Random tests (47)', async function random47 (t) {
   await applyRandomTests(t, 47)
 })
 
+/*
+
 test('y-array: Random tests (200)', async function random200 (t) {
   await applyRandomTests(t, 200)
 })
@@ -153,3 +151,4 @@ test('y-array: Random tests (400)', async function random400 (t) {
 test('y-array: Random tests (500)', async function random500 (t) {
   await applyRandomTests(t, 500)
 })
+*/
