@@ -340,7 +340,7 @@ function extend (Y) {
         }
       })
       for (var i = 0; i < _types.length; i++) {
-        var type = yield* this.store.initType.call(this, _types[i])
+        var type = yield * this.store.initType.call(this, _types[i])
         type._parent = model.id
       }
       return new YArray(os, model.id, _content)
