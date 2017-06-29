@@ -5,7 +5,6 @@
   "main": "./y-array.js",
   "scripts": {
     "dist": "rollup -c rollup.dist.js",
-    "test": "rollup -c rollup.test.js && node test.js",
     "debug": "concurrently 'rollup -wc rollup.test.js' 'cutest-serve y-array.test.js -o'",
     "lint": "standard",
     "watch": "rollup -wc rollup.dist.js -o ../yjs/examples/bower_components/y-array/y-array.js"
