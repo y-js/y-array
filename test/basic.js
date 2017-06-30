@@ -1,4 +1,4 @@
-import { wait, initArrays, flushAll, compareUsers, Y, garbageCollectUsers } from 'yjs/tests-lib/helper.js'
+import { wait, initArrays, flushAll, compareUsers, Y, garbageCollectUsers } from '../../yjs/tests-lib/helper.js'
 import { test, proxyConsole } from 'cutest'
 
 proxyConsole()

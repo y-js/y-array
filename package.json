@@ -37,6 +37,7 @@
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-latest": "^6.24.1",
+    "chance": "^1.0.10",
     "concurrently": "^3.4.0",
     "cutest": "^0.1.9",
     "rollup-plugin-babel": "^2.7.1",
@@ -45,8 +46,7 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-uglify": "^1.0.2",
     "rollup-watch": "^3.2.2",
-    "standard": "^10.0.2",
-    "yjs": "file:../yjs"
+    "standard": "^10.0.2"
   },
   "peerDependencies": {
     "yjs": ">= 12.3.1 < 13.0.0"

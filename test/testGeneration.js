@@ -1,5 +1,5 @@
 
-import { wait, initArrays, compareUsers, Y, flushSome, flushAll } from 'yjs/tests-lib/helper.js'
+import { wait, initArrays, compareUsers, Y, flushSome, flushAll } from '../../yjs/tests-lib/helper.js'
 import { test, proxyConsole } from 'cutest'
 import Chance from 'chance'
 
