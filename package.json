@@ -4,11 +4,12 @@
   "description": "Array Type for Yjs",
   "main": "./y-array.js",
   "scripts": {
+    "test": "npm run lint",
     "dist": "rollup -c rollup.dist.js",
     "debug": "concurrently 'rollup -wc rollup.test.js' 'cutest-serve y-array.test.js -o'",
     "lint": "standard",
     "watch": "rollup -wc rollup.dist.js",
-    "postversion": "npm run lint && npm run dist",
+    "postversion": "npm run dist",
     "postpublish": "tag-dist-files --overwrite-existing-tag"
   },
   "files": [
