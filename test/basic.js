@@ -6,7 +6,28 @@ proxyConsole()
 var database = { name: 'memory' }
 var connector = { name: 'test', url: 'http://localhost:1234' }
 
-test(`insert three elements, try re-get property`, async function basic1 (t) {
+test('basic spec', async function basic0 (t) {
+  let { users, array0 } = await initArrays(t, { users: 2, connector: connector, db: database })
+
+  array0.delete(0, 0)
+  t.assert(true, 'Does not throw when deleting zero elements with position 0')
+
+  let throwInvalidPosition = false
+  try {
+    array0.delete(1, 0)
+  } catch (e) {
+    throwInvalidPosition = true
+  }
+  t.assert(throwInvalidPosition, 'Throws when deleting zero elements with an invalid position')
+
+  array0.insert(0, ['A'])
+  array0.delete(1, 0)
+  t.assert(true, 'Does not throw when deleting zero elements with valid position 1')
+
+  await compareUsers(t, users)
+})
+
+test('insert three elements, try re-get property', async function basic1 (t) {
   var { users, array0, array1 } = await initArrays(t, { users: 2, connector: connector, db: database })
   array0.insert(0, [1, 2, 3])
   t.compare(array0.toArray(), [1, 2, 3], '.toArray() works')
