@@ -7,12 +7,17 @@
     "dist": "rollup -c rollup.dist.js",
     "debug": "concurrently 'rollup -wc rollup.test.js' 'cutest-serve y-array.test.js -o'",
     "lint": "standard",
-    "watch": "rollup -wc rollup.dist.js -o ../yjs/examples/bower_components/y-array/y-array.js"
+    "watch": "rollup -wc rollup.dist.js",
+    "postversion": "npm run lint && npm run dist",
+    "postpublish": "tag-dist-files --overwrite-existing-tag"
   },
+  "files": [
+    "y-array.*"
+  ],
   "standard": {
     "ignore": [
-      "build/**",
-      "dist/**"
+      "/y-array.js",
+      "/y-array.test.js"
     ]
   },
   "repository": {
@@ -46,7 +51,8 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-uglify": "^1.0.2",
     "rollup-watch": "^3.2.2",
-    "standard": "^10.0.2"
+    "standard": "^10.0.2",
+    "tag-dist-files": "^0.1.6"
   },
   "peerDependencies": {
     "yjs": ">= 12.3.1 < 13.0.0"
