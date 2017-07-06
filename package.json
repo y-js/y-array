@@ -2,13 +2,15 @@
   "name": "y-array",
   "version": "11.0.0-1",
   "description": "Array Type for Yjs",
-  "main": "./y-array.js",
+  "main": "./y-array.node.js",
+  "browser": "./y-array.js",
+  "module": "./src/y-array.js",
   "scripts": {
     "test": "npm run lint",
-    "dist": "rollup -c rollup.dist.js",
+    "dist": "rollup -c rollup.browser.js && rollup -c rollup.node.js",
     "debug": "concurrently 'rollup -wc rollup.test.js' 'cutest-serve y-array.test.js -o'",
     "lint": "standard",
-    "watch": "rollup -wc rollup.dist.js",
+    "watch": "concurrently 'rollup -wc rollup.browser.js' 'rollup -wc rollup.node.js'",
     "postversion": "npm run dist",
     "postpublish": "tag-dist-files --overwrite-existing-tag"
   },
