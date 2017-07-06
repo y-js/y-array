@@ -1,6 +1,6 @@
 {
   "name": "y-array",
-  "version": "11.0.0-0",
+  "version": "11.0.0-1",
   "description": "Array Type for Yjs",
   "main": "./y-array.js",
   "scripts": {
