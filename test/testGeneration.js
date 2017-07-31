@@ -67,9 +67,10 @@ var arrayTransactions = [
   }
 ]
 
-async function applyRandomTests (t, iterations) {
+export async function applyRandomTests (t, iterations) {
   const chance = new Chance(t.getSeed() * 1000000000)
-  var { users } = await initArrays(t, { users: 5, connector: connector, db: database, chance: chance })
+  var initInformation = await initArrays(t, { users: 5, connector: connector, db: database, chance: chance })
+  let { users } = initInformation
   for (var i = 0; i < iterations; i++) {
     if (chance.bool({likelihood: 10})) {
       // 10% chance to disconnect/reconnect a user
@@ -108,6 +109,7 @@ async function applyRandomTests (t, iterations) {
     test(t, user, chance)
   }
   await compareUsers(t, users)
+  return initInformation
 }
 
 test('y-array: Random tests (42)', async function random42 (t) {

@@ -6,6 +6,41 @@ proxyConsole()
 var database = { name: 'memory' }
 var connector = { name: 'test', url: 'http://localhost:1234' }
 
+test('basic map tests', async function map0 (t) {
+  let { users, map0, map1, map2 } = await initArrays(t, { users: 3, connector: connector, db: database })
+  users[2].disconnect()
+
+  map0.set('number', 1)
+  map0.set('string', 'hello Y')
+  map0.set('object', { key: { key2: 'value' } })
+  map0.set('y-map', Y.Map)
+  let map = map0.get('y-map')
+  map.set('y-array', Y.Array)
+  let array = map.get('y-array')
+  array.insert(0, [0])
+  array.insert(0, [-1])
+
+  t.assert(map0.get('number') === 1, 'client 0 computed the change (number)')
+  t.assert(map0.get('string') === 'hello Y', 'client 0 computed the change (string)')
+  t.compare(map0.get('object'), { key: { key2: 'value' } }, 'client 0 computed the change (object)')
+  t.assert(map0.get('y-map').get('y-array').get(0) === -1, 'client 0 computed the change (type)')
+
+  await users[2].reconnect()
+  await flushAll(t, users)
+
+  t.assert(map1.get('number') === 1, 'client 1 received the update (number)')
+  t.assert(map1.get('string') === 'hello Y', 'client 1 received the update (string)')
+  t.compare(map1.get('object'), { key: { key2: 'value' } }, 'client 1 received the update (object)')
+  t.assert(map1.get('y-map').get('y-array').get(0) === -1, 'client 1 received the update (type)')
+
+  // compare disconnected user
+  t.assert(map2.get('number') === 1, 'client 2 received the update (number) - was disconnected')
+  t.assert(map2.get('string') === 'hello Y', 'client 2 received the update (string) - was disconnected')
+  t.compare(map2.get('object'), { key: { key2: 'value' } }, 'client 2 received the update (object) - was disconnected')
+  t.assert(map2.get('y-map').get('y-array').get(0) === -1, 'client 2 received the update (type) - was disconnected')
+  await compareUsers(t, users)
+})
+
 test('basic spec', async function basic0 (t) {
   let { users, array0 } = await initArrays(t, { users: 2, connector: connector, db: database })
 
@@ -47,6 +82,7 @@ test('concurrent insert (handle three conflicts)', async function basic2 (t) {
 
 test('concurrent insert&delete (handle three conflicts)', async function basic3 (t) {
   var { users, array0, array1, array2 } = await initArrays(t, { users: 3, connector: connector, db: database })
+  window.users = users // TODO: udtrian
   array0.insert(0, ['x', 'y', 'z'])
   await flushAll(t, users)
   array0.insert(1, [0])
