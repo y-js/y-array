@@ -1,6 +1,115 @@
 /* global Y */
 
 function extend (Y) {
+  Y.utils.yarrayEventHandler = function (op) {
+    if (op.struct === 'Insert') {
+      // when using indexeddb db adapter, the op could already exist (see y-js/y-indexeddb#2)
+      if (this._content.some(function (c) { return Y.utils.compareIds(c.id, op.id) })) {
+        // op exists
+        return
+      }
+      let pos
+      // we check op.left only!,
+      // because op.right might not be defined when this is called
+      if (op.left === null) {
+        pos = 0
+      } else {
+        pos = 1 + this._content.findIndex(function (c) {
+          return Y.utils.compareIds(c.id, op.left)
+        })
+        if (pos <= 0) {
+          throw new Error('Unexpected operation!')
+        }
+      }
+
+      /*
+      (see above for new approach)
+      var _e = this._content[pos]
+      // when using indexeddb db adapter, the op could already exist (see y-js/y-indexeddb#2)
+      // If the algorithm works correctly, the double should always exist on the correct position (pos - the computed destination)
+      if (_e != null && Y.utils.compareIds(_e.id, op.id)) {
+        // is already defined
+        return
+      }
+      */
+      var values
+      var length
+      if (op.hasOwnProperty('opContent')) {
+        this._content.splice(pos, 0, {
+          id: op.id,
+          type: op.opContent
+        })
+        length = 1
+        let type = this.os.getType(op.opContent)
+        type._parent = this._model
+        values = [type]
+      } else {
+        var contents = op.content.map(function (c, i) {
+          return {
+            id: [op.id[0], op.id[1] + i],
+            val: c
+          }
+        })
+        // insert value in _content
+        // It is not possible to insert more than ~2^16 elements in an Array (see #5). We handle this case explicitly
+        if (contents.length < 30000) {
+          this._content.splice.apply(this._content, [pos, 0].concat(contents))
+        } else {
+          this._content = this._content.slice(0, pos).concat(contents).concat(this._content.slice(pos))
+        }
+        values = op.content
+        length = op.content.length
+      }
+      Y.utils.bubbleEvent(this, {
+        type: 'insert',
+        object: this,
+        index: pos,
+        values: values,
+        length: length
+      })
+    } else if (op.struct === 'Delete') {
+      var i = 0 // current position in _content
+      for (; i < this._content.length && op.length > 0; i++) {
+        var c = this._content[i]
+        if (Y.utils.inDeletionRange(op, c.id)) {
+          // is in deletion range!
+          var delLength
+          // check how many character to delete in one flush
+          for (delLength = 1;
+                delLength < op.length && i + delLength < this._content.length && Y.utils.inDeletionRange(op, this._content[i + delLength].id);
+                delLength++) {}
+          // last operation that will be deleted
+          c = this._content[i + delLength - 1]
+          // update delete operation
+          op.length -= c.id[1] - op.target[1] + 1
+          op.target = [c.id[0], c.id[1] + 1]
+          // apply deletion & find send event
+          let content = this._content.splice(i, delLength)
+          let values = content.map((c) => {
+            if (c.val != null) {
+              return c.val
+            } else {
+              return this.os.getType(c.type)
+            }
+          })
+          Y.utils.bubbleEvent(this, {
+            type: 'delete',
+            object: this,
+            index: i,
+            values: values,
+            _content: content,
+            length: delLength
+          })
+          // with the fresh delete op, we can continue
+          // note: we don't have to increment i, because the i-th content was deleted
+          // but on the other had, the (i+delLength)-th was not in deletion range
+          // So we don't do i--
+        }
+      }
+    } else {
+      throw new Error('Unexpected struct!')
+    }
+  }
   class YArray extends Y.utils.CustomType {
     constructor (os, _model, _content) {
       super()
@@ -8,122 +117,10 @@ function extend (Y) {
       this._model = _model
       // Array of all the neccessary content
       this._content = _content
-
       // the parent of this type
       this._parent = null
       this._deepEventHandler = new Y.utils.EventListenerHandler()
-
-      // this._debugEvents = [] // TODO: remove!!
-      this.eventHandler = new Y.utils.EventHandler((op) => {
-        // this._debugEvents.push(JSON.parse(JSON.stringify(op)))
-        if (op.struct === 'Insert') {
-          // when using indexeddb db adapter, the op could already exist (see y-js/y-indexeddb#2)
-          if (this._content.some(function (c) { return Y.utils.compareIds(c.id, op.id) })) {
-            // op exists
-            return
-          }
-          let pos
-          // we check op.left only!,
-          // because op.right might not be defined when this is called
-          if (op.left === null) {
-            pos = 0
-          } else {
-            pos = 1 + this._content.findIndex(function (c) {
-              return Y.utils.compareIds(c.id, op.left)
-            })
-            if (pos <= 0) {
-              throw new Error('Unexpected operation!')
-            }
-          }
-
-          /*
-          (see above for new approach)
-          var _e = this._content[pos]
-          // when using indexeddb db adapter, the op could already exist (see y-js/y-indexeddb#2)
-          // If the algorithm works correctly, the double should always exist on the correct position (pos - the computed destination)
-          if (_e != null && Y.utils.compareIds(_e.id, op.id)) {
-            // is already defined
-            return
-          }
-          */
-          var values
-          var length
-          if (op.hasOwnProperty('opContent')) {
-            this._content.splice(pos, 0, {
-              id: op.id,
-              type: op.opContent
-            })
-            length = 1
-            let type = this.os.getType(op.opContent)
-            type._parent = this._model
-            values = [type]
-          } else {
-            var contents = op.content.map(function (c, i) {
-              return {
-                id: [op.id[0], op.id[1] + i],
-                val: c
-              }
-            })
-            // insert value in _content
-            // It is not possible to insert more than ~2^16 elements in an Array (see #5). We handle this case explicitly
-            if (contents.length < 30000) {
-              this._content.splice.apply(this._content, [pos, 0].concat(contents))
-            } else {
-              this._content = this._content.slice(0, pos).concat(contents).concat(this._content.slice(pos))
-            }
-            values = op.content
-            length = op.content.length
-          }
-          Y.utils.bubbleEvent(this, {
-            type: 'insert',
-            object: this,
-            index: pos,
-            values: values,
-            length: length
-          })
-        } else if (op.struct === 'Delete') {
-          var i = 0 // current position in _content
-          for (; i < this._content.length && op.length > 0; i++) {
-            var c = this._content[i]
-            if (Y.utils.inDeletionRange(op, c.id)) {
-              // is in deletion range!
-              var delLength
-              // check how many character to delete in one flush
-              for (delLength = 1;
-                    delLength < op.length && i + delLength < this._content.length && Y.utils.inDeletionRange(op, this._content[i + delLength].id);
-                    delLength++) {}
-              // last operation that will be deleted
-              c = this._content[i + delLength - 1]
-              // update delete operation
-              op.length -= c.id[1] - op.target[1] + 1
-              op.target = [c.id[0], c.id[1] + 1]
-              // apply deletion & find send event
-              let content = this._content.splice(i, delLength)
-              let values = content.map((c) => {
-                if (c.val != null) {
-                  return c.val
-                } else {
-                  return this.os.getType(c.type)
-                }
-              })
-              Y.utils.bubbleEvent(this, {
-                type: 'delete',
-                object: this,
-                index: i,
-                values: values,
-                _content: content,
-                length: delLength
-              })
-              // with the fresh delete op, we can continue
-              // note: we don't have to increment i, because the i-th content was deleted
-              // but on the other had, the (i+delLength)-th was not in deletion range
-              // So we don't do i--
-            }
-          }
-        } else {
-          throw new Error('Unexpected struct!')
-        }
-      })
+      this.eventHandler = new Y.utils.EventHandler(Y.utils.yarrayEventHandler.bind(this))
     }
     _getPathToChild (childId) {
       return this._content.findIndex(c =>
@@ -223,20 +220,20 @@ function extend (Y) {
         prevId = op.id
       }
       var eventHandler = this.eventHandler
-      this.os.requestTransaction(function * () {
+      this.os.requestTransaction(function () {
         // now we can set the right reference.
         var mostRight
         if (mostLeft != null) {
-          var ml = yield * this.getInsertionCleanEnd(mostLeft)
+          var ml = this.getInsertionCleanEnd(mostLeft)
           mostRight = ml.right
         } else {
-          mostRight = (yield * this.getOperation(ops[0].parent)).start
+          mostRight = (this.getOperation(ops[0].parent)).start
         }
         for (var j = 0; j < ops.length; j++) {
           var op = ops[j]
           op.right = mostRight
         }
-        yield * eventHandler.awaitOps(this, this.applyCreatedOperations, [ops])
+        eventHandler.awaitOps(this, this.applyCreatedOperations, [ops])
       })
       // always remember to do that after this.os.requestTransaction
       // (otherwise values might contain a undefined reference to type)
@@ -273,8 +270,8 @@ function extend (Y) {
           length: delLength
         })
       }
-      this.os.requestTransaction(function * () {
-        yield * eventHandler.awaitOps(this, this.applyCreatedOperations, [dels])
+      this.os.requestTransaction(function () {
+        eventHandler.awaitOps(this, this.applyCreatedOperations, [dels])
       })
       // always remember to do that after this.os.requestTransaction
       // (otherwise values might contain a undefined reference to type)
@@ -292,14 +289,14 @@ function extend (Y) {
     unobserveDeep (f) {
       this._deepEventHandler.removeEventListener(f)
     }
-    * _changed (transaction, op) {
+    _changed (transaction, op) {
       if (!op.deleted) {
         if (op.struct === 'Insert') {
           // update left
           var l = op.left
           var left
           while (l != null) {
-            left = yield * transaction.getInsertion(l)
+            left = transaction.getInsertion(l)
             if (!left.deleted) {
               break
             }
@@ -308,7 +305,7 @@ function extend (Y) {
           op.left = l
           // if op contains opContent, initialize it
           if (op.opContent != null) {
-            yield * transaction.store.initType.call(transaction, op.opContent)
+            transaction.store.initType.call(transaction, op.opContent)
           }
         }
         this.eventHandler.receivedOp(op)
@@ -320,10 +317,10 @@ function extend (Y) {
     name: 'Array',
     class: YArray,
     struct: 'List',
-    initType: function * YArrayInitializer (os, model) {
+    initType: function YArrayInitializer (os, model) {
       var _content = []
       var _types = []
-      yield * Y.Struct.List.map.call(this, model, function (op) {
+      Y.Struct.List.map.call(this, model, function (op) {
         if (op.hasOwnProperty('opContent')) {
           _content.push({
             id: op.id,
@@ -340,7 +337,7 @@ function extend (Y) {
         }
       })
       for (var i = 0; i < _types.length; i++) {
-        var type = yield * this.store.initType.call(this, _types[i])
+        let type = this.store.initType.call(this, _types[i])
         type._parent = model.id
       }
       return new YArray(os, model.id, _content)
