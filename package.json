@@ -1,6 +1,6 @@
 {
   "name": "y-array",
-  "version": "11.0.0-3",
+  "version": "11.0.0-4",
   "description": "Array Type for Yjs",
   "main": "./y-array.node.js",
   "browser": "./y-array.js",
