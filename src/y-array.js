@@ -138,6 +138,22 @@ function extend (Y) {
     get length () {
       return this._content.length
     }
+    toJSON () {
+      return this._content.map(x => {
+        if (x.type != null) {
+          let type = this.os.getType(x.type)
+          if (type.toJSON != null) {
+            return type.toJSON()
+          } else if (type.toString != null) {
+            return type.toString()
+          } else {
+            return undefined
+          }
+        } else {
+          return x.val
+        }
+      })
+    }
     get (pos) {
       if (pos == null || typeof pos !== 'number') {
         throw new Error('pos must be a number!')
